@@ -5,12 +5,12 @@
 
 // ── 1. FIREBASE CONFIG ── Remplace avec tes vraies clés ──
 const firebaseConfig = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT.firebaseapp.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId:             "YOUR_APP_ID"
+  apiKey: "AIzaSyBZ884tU0oT_bDljeCsPeMB0nOVxzbmfs4",
+  authDomain: "amexperts-and-partners.firebaseapp.com",
+  projectId: "amexperts-and-partners",
+  storageBucket: "amexperts-and-partners.firebasestorage.app",
+  messagingSenderId: "659477414372",
+  appId: "1:659477414372:web:bea30caf34ce75505187f1"
 };
 
 let db = null;
