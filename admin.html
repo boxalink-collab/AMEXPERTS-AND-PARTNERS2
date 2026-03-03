@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Back-Office — AMEXPERTS & PARTNERS</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<style>
+/* ── ADMIN EXTRA STYLES ── */
+body { background:#f4f1f8; margin:0; }
+
+/* LOGIN */
+.login-wrap {
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg,#2a0d38 0%,#8B35A0 50%,#2a0d38 100%);
+}
+.login-box {
+  background:#fff; border-radius:10px; padding:2.5rem;
+  width:100%; max-width:400px; box-shadow:0 24px 64px rgba(0,0,0,.3);
+}
+.login-logo {
+  width:70px; height:70px; border-radius:50%; background:var(--purple);
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-size:1.8rem; margin:0 auto 1.25rem;
+}
+.login-box h2 { text-align:center; font-size:1.5rem; margin-bottom:.3rem; }
+.login-box .sub { text-align:center; font-size:.84rem; color:var(--gray); margin-bottom:1.75rem; }
+.login-err {
+  display:none; margin-top:1rem; padding:.75rem 1rem;
+  background:#fce4ec; border-radius:4px; border-left:3px solid #c62828;
+  font-size:.83rem; color:#c62828;
+}
+.pwd-wrap { position:relative; }
+.pwd-wrap input { padding-right:2.8rem !important; }
+.pwd-eye {
+  position:absolute; right:.75rem; top:50%; transform:translateY(-50%);
+  background:none; border:none; color:var(--gray); cursor:pointer; font-size:.95rem;
+}
+.login-footer { text-align:center; margin-top:1.5rem; font-size:.78rem; color:var(--gray); }
+.login-footer a { color:var(--purple); }
+
+/* ADMIN LAYOUT */
+.admin-layout { display:flex; min-height:100vh; }
+.admin-sidebar {
+  width:255px; background:#1a1a2e; display:flex; flex-direction:column;
+  flex-shrink:0; position:sticky; top:0; height:100vh; overflow-y:auto;
+}
+.sidebar-brand {
+  padding:1.4rem 1.5rem; border-bottom:1px solid rgba(255,255,255,.07);
+}
+.sidebar-brand .name { color:#fff; font-family:var(--font-serif); font-size:1rem; font-weight:700; line-height:1.3; }
+.sidebar-brand .name span { color:var(--purple-light); }
+.sidebar-brand .role { font-size:.72rem; color:rgba(255,255,255,.35); margin-top:.25rem; font-family:var(--font-sans); }
+.sidebar-user {
+  padding:.85rem 1.5rem; border-bottom:1px solid rgba(255,255,255,.07);
+  display:flex; align-items:center; gap:.75rem;
+}
+.sidebar-user .avatar { width:32px; height:32px; border-radius:50%; background:var(--purple); display:flex; align-items:center; justify-content:center; color:#fff; font-size:.85rem; flex-shrink:0; }
+.sidebar-user .email { font-size:.75rem; color:rgba(255,255,255,.5); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sidebar-nav { padding:.5rem 0; flex:1; }
+.sidebar-nav a {
+  display:flex; align-items:center; gap:.7rem; padding:.62rem 1.5rem;
+  color:rgba(255,255,255,.6); font-size:.83rem; font-weight:500;
+  transition:all .2s; border-left:3px solid transparent; cursor:pointer;
+}
+.sidebar-nav a:hover, .sidebar-nav a.active {
+  color:#fff; background:rgba(139,53,160,.2); border-left-color:var(--purple);
+}
+.sidebar-nav a i { width:17px; text-align:center; color:var(--purple-light); font-size:.9rem; }
+.sidebar-nav .divider { height:1px; background:rgba(255,255,255,.06); margin:.4rem 1.5rem; }
+.sidebar-nav .nav-label { padding:.5rem 1.5rem; font-size:.68rem; color:rgba(255,255,255,.25); text-transform:uppercase; letter-spacing:.12em; font-family:var(--font-sans); font-weight:700; }
+.count-pill { background:var(--purple); color:#fff; font-size:.66rem; font-weight:700; padding:.1rem .42rem; border-radius:10px; margin-left:auto; }
+
+/* MAIN */
+.admin-main { flex:1; display:flex; flex-direction:column; min-width:0; background:#f4f1f8; }
+.admin-topbar {
+  background:#fff; padding:.9rem 2rem; display:flex; align-items:center;
+  justify-content:space-between; border-bottom:1px solid #e8e0f0;
+  box-shadow:0 1px 4px rgba(0,0,0,.05); position:sticky; top:0; z-index:100;
+}
+.topbar-left { display:flex; align-items:center; gap:.75rem; }
+.topbar-left h1 { font-size:1.2rem; font-weight:700; font-family:var(--font-serif); }
+.topbar-sub { font-size:.78rem; color:var(--gray); font-family:var(--font-sans); font-weight:400; }
+.admin-content { padding:1.75rem; flex:1; }
+
+/* TABS */
+.admin-tab { display:none; }
+.admin-tab.active { display:block; }
+.section-tabs { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+.section-tab {
+  padding:.38rem 1rem; background:#fff; border:1px solid #ddd6e8;
+  border-radius:20px; font-size:.79rem; font-weight:600; cursor:pointer;
+  transition:all .2s; font-family:var(--font-sans); color:var(--gray-dark);
+}
+.section-tab.active, .section-tab:hover { background:var(--purple); color:#fff; border-color:var(--purple); }
+.panel { display:none; }
+.panel.active { display:block; }
+
+/* STAT BOXES */
+.stat-boxes { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:1.2rem; margin-bottom:1.75rem; }
+.stat-box { background:#fff; border-radius:var(--radius); padding:1.4rem; box-shadow:var(--shadow); display:flex; align-items:center; gap:1.1rem; }
+.stat-box .box-icon { width:48px; height:48px; border-radius:var(--radius); display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:#fff; flex-shrink:0; }
+.stat-box .box-num { font-family:var(--font-serif); font-size:2rem; font-weight:700; line-height:1; color:var(--black); }
+.stat-box .box-label { font-size:.76rem; color:var(--gray); text-transform:uppercase; letter-spacing:.08em; margin-top:.2rem; }
+
+/* CARDS */
+.admin-card { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:1.75rem; overflow:hidden; }
+.admin-card-header { padding:1.1rem 1.5rem; border-bottom:1px solid #f0ecf5; display:flex; justify-content:space-between; align-items:center; }
+.admin-card-header h3 { font-size:.95rem; font-weight:700; }
+.admin-card-body { padding:1.5rem; }
+
+/* TABLES */
+.admin-table { width:100%; border-collapse:collapse; font-size:.85rem; }
+.admin-table thead tr { background:#f7f4fa; }
+.admin-table th { padding:.7rem 1rem; text-align:left; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--gray-dark); border-bottom:2px solid #e8e0f0; }
+.admin-table td { padding:.72rem 1rem; border-bottom:1px solid #f0ecf5; color:var(--gray-dark); vertical-align:middle; }
+.admin-table tbody tr:hover { background:#faf8fd; }
+.admin-table .actions { display:flex; gap:.4rem; flex-wrap:wrap; }
+.btn-sm { display:inline-flex; align-items:center; gap:.3rem; padding:.28rem .7rem; font-family:var(--font-sans); font-size:.75rem; font-weight:600; border-radius:3px; border:none; cursor:pointer; transition:all .2s; }
+.btn-sm.edit  { background:rgba(139,53,160,.1); color:var(--purple); }
+.btn-sm.edit:hover  { background:var(--purple); color:#fff; }
+.btn-sm.del   { background:rgba(198,40,40,.08); color:#c62828; }
+.btn-sm.del:hover   { background:#c62828; color:#fff; }
+.btn-sm.view  { background:rgba(21,101,192,.08); color:#1565c0; }
+.btn-sm.view:hover  { background:#1565c0; color:#fff; }
+.btn-sm.reply { background:rgba(46,125,50,.1); color:#2e7d32; }
+.btn-sm.reply:hover { background:#2e7d32; color:#fff; }
+
+/* MESSAGES */
+.msg-row { display:flex; align-items:flex-start; gap:.9rem; padding:.95rem 0; border-bottom:1px solid #f0ecf5; cursor:pointer; transition:all .2s; }
+.msg-row:last-child { border-bottom:none; }
+.msg-row:hover { background:#faf8fd; margin:0 -1.5rem; padding-left:1.5rem; padding-right:1.5rem; }
+.msg-row.unread .msg-name { font-weight:700; }
+.msg-avatar { width:38px; height:38px; border-radius:50%; background:var(--purple); display:flex; align-items:center; justify-content:center; color:#fff; font-size:.88rem; font-weight:700; flex-shrink:0; }
+.msg-body-wrap { flex:1; min-width:0; }
+.msg-name { font-size:.86rem; color:var(--black); }
+.msg-service { font-size:.82rem; color:var(--gray-dark); }
+.msg-preview { font-size:.79rem; color:var(--gray); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.msg-time { font-size:.72rem; color:var(--gray); flex-shrink:0; text-align:right; }
+.unread-dot { width:7px; height:7px; border-radius:50%; background:var(--purple); flex-shrink:0; margin-top:6px; }
+.msg-detail-wrap { background:#fff; border-radius:var(--radius); padding:2rem; box-shadow:var(--shadow); }
+.msg-detail-meta p { font-size:.85rem; color:var(--gray); margin:.25rem 0; }
+.msg-detail-meta strong { color:var(--black); }
+.msg-text { background:var(--bg-light); border-radius:var(--radius); padding:1.25rem; margin:1.25rem 0; font-size:.92rem; line-height:1.85; color:var(--gray-dark); }
+.reply-box { background:#f7f4fa; border-radius:var(--radius); padding:1.4rem; margin-top:1.25rem; border:1px solid #e8e0f0; }
+.reply-box textarea { width:100%; padding:.72rem 1rem; border:1px solid #ccc3d4; border-radius:3px; font-family:var(--font-sans); font-size:.9rem; min-height:100px; resize:vertical; outline:none; }
+.reply-box textarea:focus { border-color:var(--purple); }
+
+/* FORMS */
+.admin-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.1rem; }
+.admin-form-group { display:flex; flex-direction:column; gap:.32rem; }
+.admin-form-group.full { grid-column:1/-1; }
+.admin-form-group label { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--black); }
+.admin-form-group input,
+.admin-form-group select,
+.admin-form-group textarea {
+  padding:.66rem 1rem; border:1px solid #ccc3d4; border-radius:3px;
+  font-family:var(--font-sans); font-size:.88rem; outline:none;
+  transition:border-color .2s; background:#fff; color:var(--black);
+}
+.admin-form-group input:focus,
+.admin-form-group select:focus,
+.admin-form-group textarea:focus { border-color:var(--purple); }
+.admin-form-group textarea { min-height:110px; resize:vertical; }
+
+/* IMAGE / MEDIA PREVIEW */
+.media-group { display:flex; flex-direction:column; gap:.5rem; }
+.media-input-row { display:flex; gap:.5rem; align-items:center; }
+.media-input-row input { flex:1; }
+.media-preview {
+  width:100%; height:130px; background:#f0ecf5; border-radius:4px;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; border:1px dashed #ccc3d4; margin-top:.3rem;
+}
+.media-preview img { width:100%; height:100%; object-fit:cover; }
+.media-preview .no-img { color:var(--gray); font-size:.82rem; text-align:center; line-height:1.5; }
+.media-preview .no-img i { font-size:2rem; display:block; margin-bottom:.4rem; opacity:.3; }
+
+/* FILE ATTACHMENT PREVIEW */
+.file-preview {
+  display:flex; align-items:center; gap:.75rem; padding:.75rem 1rem;
+  background:#f7f4fa; border-radius:4px; border:1px solid #e0d8ec; margin-top:.3rem;
+}
+.file-preview i { font-size:1.5rem; color:var(--purple); }
+.file-preview .fname { font-size:.84rem; font-weight:600; color:var(--black); }
+.file-preview .ftype { font-size:.75rem; color:var(--gray); }
+
+/* BADGE */
+.badge-new    { background:rgba(139,53,160,.12); color:var(--purple); font-size:.69rem; font-weight:700; padding:.17rem .58rem; border-radius:20px; text-transform:uppercase; letter-spacing:.06em; }
+.badge-read   { background:#f0ecf5; color:var(--gray); font-size:.69rem; font-weight:700; padding:.17rem .58rem; border-radius:20px; text-transform:uppercase; letter-spacing:.06em; }
+.badge-open   { background:#e8f5e9; color:#2e7d32; font-size:.69rem; font-weight:700; padding:.17rem .58rem; border-radius:20px; }
+.badge-prog   { background:#fff8e1; color:#f57f17; font-size:.69rem; font-weight:700; padding:.17rem .58rem; border-radius:20px; }
+.badge-closed { background:#fce4ec; color:#c62828; font-size:.69rem; font-weight:700; padding:.17rem .58rem; border-radius:20px; }
+
+/* TOAST */
+#adminToast {
+  position:fixed; bottom:2rem; right:2rem; z-index:9999;
+  padding:.9rem 1.4rem; border-radius:4px; font-family:var(--font-sans); font-size:.87rem;
+  box-shadow:0 8px 32px rgba(0,0,0,.2); opacity:0; transition:opacity .35s; pointer-events:none;
+  max-width:380px;
+}
+
+/* EMPTY / LOADING */
+.empty-state { text-align:center; padding:3rem; color:var(--gray); }
+.empty-state i { font-size:2.5rem; display:block; margin-bottom:.75rem; opacity:.25; }
+
+@media(max-width:768px) {
+  .admin-layout { flex-direction:column; }
+  .admin-sidebar { width:100%; height:auto; position:static; }
+  .admin-form-grid { grid-template-columns:1fr; }
+  .stat-boxes { grid-template-columns:1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LOGIN
+══════════════════════════════════════ -->
+<div class="login-wrap" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo"><i class="fas fa-shield-alt"></i></div>
+    <h2>Back-Office</h2>
+    <p class="sub">AMEXPERTS &amp; PARTNERS — Administration</p>
+
+    <div class="admin-form-group" style="margin-bottom:1rem">
+      <label>Adresse email</label>
+      <input type="email" id="loginEmail" placeholder="admin@votredomaine.com" autocomplete="username">
+    </div>
+    <div class="admin-form-group" style="margin-bottom:1.5rem">
+      <label>Mot de passe</label>
+      <div class="pwd-wrap">
+        <input type="password" id="loginPwd" placeholder="••••••••" autocomplete="current-password">
+        <button type="button" class="pwd-eye" onclick="togglePwd()"><i class="fas fa-eye" id="eyeIco"></i></button>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="loginBtn" style="width:100%;justify-content:center" onclick="doLogin()">
+      <i class="fas fa-sign-in-alt"></i> Se connecter
+    </button>
+
+    <div class="login-err" id="loginErr"></div>
+
+    <div class="login-footer">
+      <a href="index.html">← Retour au site public</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     ADMIN APP
+══════════════════════════════════════ -->
+<div class="admin-layout" id="adminApp" style="display:none">
+
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-brand">
+      <div class="name">AMEXPERTS <span>&amp;</span> PARTNERS</div>
+      <div class="role">Back-Office Administrateur</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="avatar"><i class="fas fa-user"></i></div>
+      <div class="email" id="adminEmail">—</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Général</div>
+      <a onclick="switchTab('dashboard')" class="active"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a>
+      <a onclick="switchTab('messages')"><i class="fas fa-envelope"></i> Messages <span class="count-pill" id="msgPill">0</span></a>
+      <a onclick="switchTab('newsletter')"><i class="fas fa-paper-plane"></i> Newsletter</a>
+      <div class="divider"></div>
+      <div class="nav-label">Contenu du site</div>
+      <a onclick="switchTab('realisations')"><i class="fas fa-trophy"></i> Réalisations</a>
+      <a onclick="switchTab('services')"><i class="fas fa-briefcase"></i> Nos Services</a>
+      <a onclick="switchTab('projets')"><i class="fas fa-chart-line"></i> Projets Financement</a>
+      <a onclick="switchTab('partenaires')"><i class="fas fa-handshake"></i> Nos Partenaires</a>
+      <a onclick="switchTab('blog')"><i class="fas fa-newspaper"></i> Actualités / Blog</a>
+      <a onclick="switchTab('brochure')"><i class="fas fa-file-alt"></i> Brochure &amp; Docs</a>
+      <div class="divider"></div>
+      <a href="index.html" target="_blank" style="opacity:.5"><i class="fas fa-external-link-alt"></i> Voir le site</a>
+      <a onclick="doLogout()" style="color:rgba(255,100,100,.7)!important"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div class="topbar-left">
+        <h1 id="tabTitle">Tableau de bord</h1>
+        <span class="topbar-sub" id="tabSub"></span>
+      </div>
+      <button class="btn-sm edit" onclick="refreshCurrent()"><i class="fas fa-sync"></i> Actualiser</button>
+    </div>
+
+    <div class="admin-content">
+
+      <!-- ════════ DASHBOARD ════════ -->
+      <div class="admin-tab active" id="tab-dashboard">
+        <div class="stat-boxes">
+          <div class="stat-box">
+            <div class="box-icon" style="background:var(--purple)"><i class="fas fa-envelope"></i></div>
+            <div><div class="box-num" id="db-msgs">–</div><div class="box-label">Messages</div></div>
+          </div>
+          <div class="stat-box">
+            <div class="box-icon" style="background:#1565c0"><i class="fas fa-paper-plane"></i></div>
+            <div><div class="box-num" id="db-news">–</div><div class="box-label">Newsletter</div></div>
+          </div>
+          <div class="stat-box">
+            <div class="box-icon" style="background:#2e7d32"><i class="fas fa-trophy"></i></div>
+            <div><div class="box-num" id="db-real">–</div><div class="box-label">Réalisations</div></div>
+          </div>
+          <div class="stat-box">
+            <div class="box-icon" style="background:#f57f17"><i class="fas fa-chart-line"></i></div>
+            <div><div class="box-num" id="db-proj">–</div><div class="box-label">Projets</div></div>
+          </div>
+          <div class="stat-box">
+            <div class="box-icon" style="background:#6a1b9a"><i class="fas fa-handshake"></i></div>
+            <div><div class="box-num" id="db-part">–</div><div class="box-label">Partenaires</div></div>
+          </div>
+          <div class="stat-box">
+            <div class="box-icon" style="background:#00838f"><i class="fas fa-newspaper"></i></div>
+            <div><div class="box-num" id="db-blog">–</div><div class="box-label">Articles</div></div>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>Derniers messages</h3>
+            <span class="badge-new" id="unreadBadge">0 nouveau</span>
+          </div>
+          <div class="admin-card-body" id="dashMsgs">
+            <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Chargement…</p></div>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <div class="admin-card-header"><h3>Publication rapide</h3></div>
+          <div class="admin-card-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.75rem">
+            <button class="btn-purple-outline" onclick="switchTab('realisations');setTimeout(()=>showPanel('real','add'),50)" style="justify-content:center"><i class="fas fa-plus"></i> Réalisation</button>
+            <button class="btn-purple-outline" onclick="switchTab('projets');setTimeout(()=>showPanel('proj','add'),50)" style="justify-content:center"><i class="fas fa-plus"></i> Projet</button>
+            <button class="btn-purple-outline" onclick="switchTab('partenaires');setTimeout(()=>showPanel('part','add'),50)" style="justify-content:center"><i class="fas fa-plus"></i> Partenaire</button>
+            <button class="btn-purple-outline" onclick="switchTab('blog');setTimeout(()=>showPanel('blog','add'),50)" style="justify-content:center"><i class="fas fa-plus"></i> Article</button>
+            <button class="btn-purple-outline" onclick="switchTab('services');setTimeout(()=>showPanel('svc','add'),50)" style="justify-content:center"><i class="fas fa-plus"></i> Service</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ MESSAGES ════════ -->
+      <div class="admin-tab" id="tab-messages">
+        <div id="msgListWrap">
+          <div class="admin-card">
+            <div class="admin-card-header"><h3>Demandes de consultation</h3></div>
+            <div class="admin-card-body" id="msgListBody">
+              <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Chargement…</p></div>
+            </div>
+          </div>
+        </div>
+        <div id="msgDetailWrap" style="display:none"></div>
+      </div>
+
+      <!-- ════════ NEWSLETTER ════════ -->
+      <div class="admin-tab" id="tab-newsletter">
+        <div class="admin-card">
+          <div class="admin-card-header"><h3>Abonnés Newsletter</h3></div>
+          <div class="admin-card-body">
+            <table class="admin-table">
+              <thead><tr><th>#</th><th>Email</th><th>Date inscription</th></tr></thead>
+              <tbody id="newsBody"><tr><td colspan="3" style="text-align:center;padding:2rem;color:var(--gray)">Chargement…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ RÉALISATIONS ════════ -->
+      <div class="admin-tab" id="tab-realisations">
+        <div class="section-tabs">
+          <button class="section-tab active" onclick="showPanel('real','list')">Liste des réalisations</button>
+          <button class="section-tab" onclick="showPanel('real','add')">+ Ajouter</button>
+        </div>
+
+        <!-- LIST -->
+        <div class="panel active" id="real-list">
+          <div class="admin-card">
+            <div class="admin-card-header"><h3>Réalisations publiées</h3></div>
+            <div class="admin-card-body" id="realListBody">
+              <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Chargement…</p></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FORM -->
+        <div class="panel" id="real-add">
+          <div class="admin-card">
+            <div class="admin-card-header"><h3 id="realFormTitle">Ajouter une réalisation</h3></div>
+            <div class="admin-card-body">
+              <form id="realForm" onsubmit="saveDoc(event,'realisations_data','real')">
+                <input type="hidden" id="realDocId">
+                <div class="admin-form-grid">
+                  <div class="admin-form-group"><label>Titre *</label><input type="text" id="realTitre" required placeholder="Nom du projet"></div>
+                  <div class="admin-form-group"><label>Secteur</label><input type="text" id="realSecteur" placeholder="Énergie, Immobilier…"></div>
+                  <div class="admin-form-group"><label>Pays</label><input type="text" id="realPays" placeholder="Togo, Sénégal…"></div>
+                  <div class="admin-form-group"><label>Montant</label><input type="text" id="realMontant" placeholder="5 M€"></div>
+                  <div class="admin-form-group"><label>Année</label><input type="text" id="realAnnee" placeholder="2025"></div>
+                  <div class="admin-form-group"><label>Catégorie (filtre)</label>
+                    <select id="realCat">
+                      <option value="energie">Énergie</option><option value="immobilier">Immobilier</option>
+                      <option value="agroindus">Agro-industrie</option><option value="finance">Finance</option>
+                      <option value="infra">Infrastructure</option><option value="autre">Autre</option>
+                    </select>
+                  </div>
+                  <div class="admin-form-group full"><label>Description *</label><textarea id="realDesc" required placeholder="Décrivez le projet réalisé…"></textarea></div>
+
+                  <!-- IMAGE -->
+                  <div class="admin-form-group full">
+                    <label>Image / Visuel <small style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--gray)">(coller un lien image, Google Drive, Imgur, etc.)</small></label>
+                    <div class="media-group">
+                      <div class="media-input-row">
+                        <input type="url" id="realImg" placeholder="https://… lien vers l'image" oninput="previewMedia('realImg','realImgPrev')">
+                        <button type="button" class="btn-sm view" onclick="document.getElementById('realImg').value='';previewMedia('realImg','realImgPrev')"><i class="fas fa-times"></i></button>
+                      </div>
+                      <div class="media-preview" id="realImgPrev">
+                        <div class="no-img"><i class="fas fa-image"></i>Aperçu de l'image</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div style="margin-top:1.5rem;display:flex;gap:.75rem">
+                  <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Publier</button>
+                  <button type="button" class="btn-purple-outline" onclick="showPanel('real','list')">Annuler</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ SERVICES ════════ -->
+      <div class="admin-tab" id="tab-services">
+        <div class="section-tabs">
+          <button class="section-tab active" onclick="showPanel('svc','list')">Liste des services</button>
+          <button class="section-tab" onclick="showPanel('svc','add')">+ Ajouter</button>
+        </div>
+        <div class="panel active" id="svc-list">
+          <div class="admin-card">
+            <div class="admin-card-header"><h3>Services publiés</h3></div>
+            <div class="admin-card-body" id="svcListBody">
+              <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Chargement…</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel" id="svc-add">
+          <div class="admin-card">
+            <div class="admin-card-header"><h3 id="svcFormTitle">Ajouter un service</h3></div>
+            <div class="admin-card-body">
+              <form id="svcForm" onsubmit="saveDoc(event,'services_data','svc')">
+                <input type="hidden" id="svcDocId">
+                <div class="admin-form-grid">
+                  <div class="admin-form-group"><label>Titre *</label><input type="text" id="svcTitre" required placeholder="Nom du service"></div>
+                  <div class="admin-form-group"><label>Icône Font Awesome</label><input type="text" id="svcIcon" placeholder="fas fa-file-alt"></div>
+                  <div class="admin-form-group full"><label>Description *</label><textarea id="svcDesc" required placeholder="Description du service…"></textarea></div>
+                  <div class="admin-form-group full"><label>Points clés (un par ligne)</label><textarea id="svcPoints" placeholder="Études de faisabilité&#10;Business plans&#10;Dossiers bancaires…"></textarea></div>
+                  <!-- IMAGE -->
+                  <div class="admin-form-group full">
+                    <label>Image illustrative <small style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--gray)">(lien URL)</small></label>
+                    <div class="media-group">
+                      <div class="media-input-row">
+                        <input type="url" id="svcImg" placeholder="https://… lien vers l'image" oninput="previewMedia('svcImg','svcImgPrev')">
+                        <button type="button" class="btn-sm view" onclick="document.getElementById('svcImg').value='';previewMedia('svcImg','svcImgPrev')"><i class="fas fa-times"></i></button>
+                      </div>
+                      <div class="media-preview" id="svcImgPrev"><div class="no-img"><i class="fas fa-image"></i>Aperçu</div></div>
+                    </div>
+                  </div>
+                </div>
+                <div style="margin-top:1.5rem;display:flex;gap:.75rem">
+                  <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Publier</button>
+                  <button type="button" class="btn-purple-outline" onclick="showPanel('svc','list')">Annuler</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ PROJETS FINANCEMENT ════════ -->
+      <div class="admin-tab" id="tab-projets">
+        <div class="section-tabs">
+          <button class="section-tab active" onclick="showPanel('proj','list')">Portefeuille</button>
+          <button class="section-tab" onclick="showPanel('proj','add')">+ Ajouter</button>
+        </div>
+        <div class="panel active" id="proj-list">
+          <div class="admin-card">
+            <div class="admin-card-header"><h3>Projets en financement</h3></div>
+            <div class="admin-card-body" id="projListBody">
+              <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Chargement…</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel" id="proj-add">
+          <div class="admin-card">
+            <div class="admin-card-header"><h3 id="projFormTitle">Ajouter un projet</h3></div>
+            <div class="admin-card-body">
+              <form id="projForm" onsubmit="saveDoc(event,'projets_financement','proj')">
+                <input type="hidden" id="projDocId">
+                <div class="admin-form-grid">
+                  <div class="admin-form-group"><label>Référence *</label><input type="text" id="projRef" required placeholder="AM-2026-001"></div>
+                  <div class="admin-form-group"><label>Titre *</label><input type="text" id="projTitre" required placeholder="Nom du projet"></div>
+                  <div class="admin-form-group"><label>Secteur</label><input type="text" id="projSecteur" placeholder="Agro-industrie…"></div>
+                  <div class="admin-form-group"><label>Montant recherché</label><input type="text" id="projMontant" placeholder="3,5 M€"></div>
+                  <div class="admin-form-group"><label>Pays</label><input type="text" id="projPays" placeholder="Togo…"></div>
+                  <div class="admin-form-group"><label>Statut</label>
+                    <select id="projStatut">
+                      <option value="open">Ouvert</option>
+                      <option value="progress">En cours</option>
+                      <option value="closed">Clôturé</option>
+                    </select>
+                  </div>
+                  <div class="admin-form-group"><label>% Financé</label><input type="number" id="projPct" placeholder="40" min="0" max="100"></div>
+                  <div class="admin-form-group"><label>Contact investisseur</label><input type="email" id="projContact" placeholder="contact@amexperts.com"></div>
+                  <div class="admin-form-group full"><label>Description</label><textarea id="projDesc" placeholder="Décrivez le projet…"></textarea></div>
+                  <!-- IMAGE -->
+                  <div class="admin-form-group full">
+                    <label>Image du projet <small style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--gray)">(lien URL)</small></label>
+                    <div class="media-group">
+                      <div class="media-input-row">
+                        <input type="url" id="projImg" placeholder="https://…" oninput="previewMedia('projImg','projImgPrev')">
+                        <button type="button" class="btn-sm view" onclick="document.getElementById('projImg').value='';previewMedia('projImg','projImgPrev')"><i class="fas fa-times"></i></button>
+                      </div>
+                      <div class="media-preview" id="projImgPrev"><div class="no-img"><i class="fas fa-image"></i>Aperçu</div></div>
+                    </div>
+                  </div>
+                  <!-- DOCUMENT (PDF/MP4/etc.) -->
+                  <div class="admin-form-group full">
+                    <label>Document / Vidéo de présentation <small style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--gray)">(lien Google Drive, YouTube, PDF…)</small></label>
+                    <div class="media-group">
+                      <div class="media-input-row">
+                        <input type="url" id="projDoc" placeholder="https://drive.google.com/… ou https://youtube.com/…" oninput="previewFile('projDoc','projDocPrev')">
+                        <button type="button" class="btn-sm view" onclick="document.getElementById('projDoc').value='';document.getElementById('projDocPrev').style.display='none'"><i class="fas fa-times"></i></button>
+                      </div>
+                      <div class="file-preview" id="projDocPrev" style="display:none">
+                        <i class="fas fa-file"></i>
+                        <div><div class="fname" id="projDocName">Document</div><div class="ftype" id="projDocType">Lien externe</div></div>
+                        <a id="projDocLink" href="#" target="_blank" class="btn-sm view" style="margin-left:auto"><i class="fas fa-external-link-alt"></i> Ouvrir</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div style="margin-top:1.5rem;display:flex;gap:.75rem">
+                  <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Publier</button>
+                  <button type="button" class="btn-purple-outline" onclick="showPanel('proj','list')">Annuler</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ NOS PARTENAIRES ════════ -->
+      <div class="admin-tab" id="tab-partenaires">
+        <div class="section-tabs">
+          <button class="section-tab active" onclick="showPanel('part','list')">Liste</button>
+          <button class="section-tab" onclick="showPanel('part','add')">+ Ajouter</button>
+        </div>
+        <div class="panel active" id="part-list">
+          <div class="admin-card">
+            <div class="admin-card-header"><h3>Nos Partenaires</h3></div>
+            <div class="admin-card-body" id="partListBody">
+              <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Chargement…</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel" id="part-add">
+          <div class="admin-card">
+            <div class="admin-card-header"><h3 id="partFormTitle">Ajouter un partenaire</h3></div>
+            <div class="admin-card-body">
+              <form id="partForm" onsubmit="saveDoc(event,'partenaires_data','part')">
+                <input type="hidden" id="partDocId">
+                <div class="admin-form-grid">
+                  <div class="admin-form-group"><label>Nom *</label><input type="text" id="partNom" required placeholder="Nom de l'organisation"></div>
+                  <div class="admin-form-group"><label>Type</label><input type="text" id="partType" placeholder="Banque, ONG, Fonds…"></div>
+                  <div class="admin-form-group"><label>Pays</label><input type="text" id="partPays" placeholder="Togo, France…"></div>
+                  <div class="admin-form-group"><label>Site web</label><input type="url" id="partSite" placeholder="https://…"></div>
+                  <div class="admin-form-group full"><label>Description du partenariat</label><textarea id="partDesc" placeholder="Nature de la collaboration…"></textarea></div>
+                  <!-- LOGO -->
+                  <div class="admin-form-group full">
+                    <label>Logo du partenaire <small style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--gray)">(lien URL de l'image)</small></label>
+                    <div class="media-group">
+                      <div class="media-input-row">
+                        <input type="url" id="partLogo" placeholder="https://… lien vers le logo" oninput="previewMedia('partLogo','partLogoPrev')">
+                        <button type="button" class="btn-sm view" onclick="document.getElementById('partLogo').value='';previewMedia('partLogo','partLogoPrev')"><i class="fas fa-times"></i></button>
+                      </div>
+                      <div class="media-preview" id="partLogoPrev" style="height:80px"><div class="no-img"><i class="fas fa-image"></i>Logo</div></div>
+                    </div>
+                  </div>
+                </div>
+                <div style="margin-top:1.5rem;display:flex;gap:.75rem">
+                  <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Publier</button>
+                  <button type="button" class="btn-purple-outline" onclick="showPanel('part','list')">Annuler</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ BLOG / ACTUALITÉS ════════ -->
+      <div class="admin-tab" id="tab-blog">
+        <div class="section-tabs">
+          <button class="section-tab active" onclick="showPanel('blog','list')">Articles publiés</button>
+          <button class="section-tab" onclick="showPanel('blog','add')">+ Nouvel article</button>
+        </div>
+        <div class="panel active" id="blog-list">
+          <div class="admin-card">
+            <div class="admin-card-header"><h3>Articles / Actualités</h3></div>
+            <div class="admin-card-body" id="blogListBody">
+              <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Chargement…</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel" id="blog-add">
+          <div class="admin-card">
+            <div class="admin-card-header"><h3 id="blogFormTitle">Rédiger un article</h3></div>
+            <div class="admin-card-body">
+              <form id="blogForm" onsubmit="saveDoc(event,'articles','blog')">
+                <input type="hidden" id="blogDocId">
+                <div class="admin-form-grid">
+                  <div class="admin-form-group"><label>Titre *</label><input type="text" id="blogTitre" required placeholder="Titre de l'article"></div>
+                  <div class="admin-form-group"><label>Catégorie</label><input type="text" id="blogCat" placeholder="Finance, Immobilier, PPP…"></div>
+                  <div class="admin-form-group"><label>Icône (emoji)</label><input type="text" id="blogIcon" placeholder="📊" maxlength="4"></div>
+                  <div class="admin-form-group"><label>Date</label><input type="date" id="blogDate"></div>
+                  <div class="admin-form-group full"><label>Extrait / Résumé *</label><textarea id="blogExtrait" required placeholder="2-3 phrases de résumé…"></textarea></div>
+                  <div class="admin-form-group full"><label>Contenu complet</label><textarea id="blogContenu" style="min-height:200px" placeholder="Contenu de l'article…"></textarea></div>
+                  <!-- IMAGE -->
+                  <div class="admin-form-group full">
+                    <label>Image de couverture <small style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--gray)">(lien URL)</small></label>
+                    <div class="media-group">
+                      <div class="media-input-row">
+                        <input type="url" id="blogImg" placeholder="https://…" oninput="previewMedia('blogImg','blogImgPrev')">
+                        <button type="button" class="btn-sm view" onclick="document.getElementById('blogImg').value='';previewMedia('blogImg','blogImgPrev')"><i class="fas fa-times"></i></button>
+                      </div>
+                      <div class="media-preview" id="blogImgPrev"><div class="no-img"><i class="fas fa-image"></i>Aperçu</div></div>
+                    </div>
+                  </div>
+                  <!-- PIÈCE JOINTE (PDF, video, etc.) -->
+                  <div class="admin-form-group full">
+                    <label>Pièce jointe / Vidéo <small style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--gray)">(PDF Google Drive, YouTube, MP4…)</small></label>
+                    <div class="media-group">
+                      <div class="media-input-row">
+                        <input type="url" id="blogDoc" placeholder="https://…" oninput="previewFile('blogDoc','blogDocPrev')">
+                        <button type="button" class="btn-sm view" onclick="document.getElementById('blogDoc').value='';document.getElementById('blogDocPrev').style.display='none'"><i class="fas fa-times"></i></button>
+                      </div>
+                      <div class="file-preview" id="blogDocPrev" style="display:none">
+                        <i class="fas fa-file"></i>
+                        <div><div class="fname" id="blogDocName">Document</div><div class="ftype" id="blogDocType">Lien</div></div>
+                        <a id="blogDocLink" href="#" target="_blank" class="btn-sm view" style="margin-left:auto"><i class="fas fa-external-link-alt"></i></a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div style="margin-top:1.5rem;display:flex;gap:.75rem">
+                  <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Publier</button>
+                  <button type="button" class="btn-purple-outline" onclick="showPanel('blog','list')">Annuler</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ BROCHURE & DOCS ════════ -->
+      <div class="admin-tab" id="tab-brochure">
+        <div class="section-tabs">
+          <button class="section-tab active" onclick="showPanel('broch','list')">Documents publiés</button>
+          <button class="section-tab" onclick="showPanel('broch','add')">+ Ajouter un document</button>
+        </div>
+        <div class="panel active" id="broch-list">
+          <div class="admin-card">
+            <div class="admin-card-header"><h3>Brochures &amp; Documents téléchargeables</h3></div>
+            <div class="admin-card-body" id="brochListBody">
+              <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Chargement…</p></div>
+            </div>
+          </div>
+          <div class="admin-card" style="margin-top:0">
+            <div class="admin-card-header"><h3>Statistiques de téléchargements</h3></div>
+            <div class="admin-card-body" id="brochStats" style="color:var(--gray);font-size:.88rem">Chargement…</div>
+          </div>
+        </div>
+        <div class="panel" id="broch-add">
+          <div class="admin-card">
+            <div class="admin-card-header"><h3 id="brochFormTitle">Ajouter un document</h3></div>
+            <div class="admin-card-body">
+              <form id="brochForm" onsubmit="saveDoc(event,'brochure_docs','broch')">
+                <input type="hidden" id="brochDocId">
+                <div class="admin-form-grid">
+                  <div class="admin-form-group"><label>Titre du document *</label><input type="text" id="brochTitre" required placeholder="Brochure Générale 2026"></div>
+                  <div class="admin-form-group"><label>Type</label>
+                    <select id="brochType">
+                      <option value="pdf">PDF</option>
+                      <option value="presentation">Présentation</option>
+                      <option value="video">Vidéo</option>
+                      <option value="autre">Autre</option>
+                    </select>
+                  </div>
+                  <div class="admin-form-group"><label>Taille (indicative)</label><input type="text" id="brochSize" placeholder="2,4 MB"></div>
+                  <div class="admin-form-group"><label>Accès</label>
+                    <select id="brochAcces">
+                      <option value="email">Sur demande par email</option>
+                      <option value="direct">Lien direct</option>
+                    </select>
+                  </div>
+                  <div class="admin-form-group full"><label>Description</label><textarea id="brochDesc" placeholder="Décrivez le contenu du document…"></textarea></div>
+                  <!-- LIEN FICHIER -->
+                  <div class="admin-form-group full">
+                    <label>Lien du fichier <small style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--gray)">(Google Drive, Dropbox, YouTube, lien direct PDF…)</small></label>
+                    <div class="media-group">
+                      <div class="media-input-row">
+                        <input type="url" id="brochUrl" placeholder="https://drive.google.com/…" oninput="previewFile('brochUrl','brochFilePrev')">
+                        <button type="button" class="btn-sm view" onclick="document.getElementById('brochUrl').value='';document.getElementById('brochFilePrev').style.display='none'"><i class="fas fa-times"></i></button>
+                      </div>
+                      <div class="file-preview" id="brochFilePrev" style="display:none">
+                        <i class="fas fa-file-pdf"></i>
+                        <div><div class="fname" id="brochFileName">Document</div><div class="ftype" id="brochFileType">Lien externe</div></div>
+                        <a id="brochFileLink" href="#" target="_blank" class="btn-sm view" style="margin-left:auto"><i class="fas fa-external-link-alt"></i> Ouvrir</a>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- IMAGE DE COUVERTURE -->
+                  <div class="admin-form-group full">
+                    <label>Image de couverture <small style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--gray)">(lien URL)</small></label>
+                    <div class="media-group">
+                      <div class="media-input-row">
+                        <input type="url" id="brochImg" placeholder="https://…" oninput="previewMedia('brochImg','brochImgPrev')">
+                        <button type="button" class="btn-sm view" onclick="document.getElementById('brochImg').value='';previewMedia('brochImg','brochImgPrev')"><i class="fas fa-times"></i></button>
+                      </div>
+                      <div class="media-preview" id="brochImgPrev"><div class="no-img"><i class="fas fa-image"></i>Aperçu</div></div>
+                    </div>
+                  </div>
+                </div>
+                <div style="margin-top:1.5rem;display:flex;gap:.75rem">
+                  <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Publier</button>
+                  <button type="button" class="btn-purple-outline" onclick="showPanel('broch','list')">Annuler</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /admin-content -->
+  </div><!-- /admin-main -->
+</div><!-- /admin-layout -->
+
+<div id="adminToast"></div>
+
+<!-- ══════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════ -->
+<script>
+// ╔══════════════════════════════════════════════════════╗
+//  FIREBASE CONFIG  ←  REMPLACE avec tes vraies clés !
+// ╚══════════════════════════════════════════════════════╝
+const FIREBASE_CONFIG = {
+  apiKey:            "YOUR_API_KEY",
+  authDomain:        "YOUR_PROJECT.firebaseapp.com",
+  projectId:         "YOUR_PROJECT_ID",
+  storageBucket:     "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId:             "YOUR_APP_ID"
+};
+
+// ── INIT ────────────────────────────────────────────────
+let db   = null;
+let auth = null;
+let currentTab = 'dashboard';
+
+(function boot() {
+  try {
+    const app = firebase.apps.length
+      ? firebase.app()
+      : firebase.initializeApp(FIREBASE_CONFIG);
+    db   = firebase.firestore();
+    auth = firebase.auth();
+    console.log('✅ Firebase OK');
+
+    // Observer d'état d'authentification — c'est lui qui contrôle tout
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        // ✅ Connecté
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminApp').style.display   = 'flex';
+        document.getElementById('adminEmail').textContent    = user.email;
+        loadDashboard();
+      } else {
+        // ❌ Déconnecté
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('adminApp').style.display   = 'none';
+      }
+    });
+  } catch(e) {
+    showErr('Erreur Firebase : ' + e.message);
+    console.error(e);
+  }
+})();
+
+// ── LOGIN ───────────────────────────────────────────────
+async function doLogin() {
+  const email = val('loginEmail');
+  const pwd   = val('loginPwd');
+
+  if (!email || !pwd) { showErr('Email et mot de passe requis.'); return; }
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connexion…';
+  hide('loginErr');
+
+  try {
+    await auth.signInWithEmailAndPassword(email, pwd);
+    // → onAuthStateChanged prend le relais
+  } catch(e) {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Se connecter';
+    const FR = {
+      'auth/user-not-found':        'Aucun compte avec cet email.',
+      'auth/wrong-password':        'Mot de passe incorrect.',
+      'auth/invalid-email':         'Email invalide.',
+      'auth/invalid-credential':    'Email ou mot de passe incorrect.',
+      'auth/too-many-requests':     'Trop de tentatives. Attendez quelques minutes.',
+      'auth/network-request-failed':'Erreur réseau. Vérifiez votre connexion.',
+      'auth/user-disabled':         'Ce compte est désactivé.',
+      'auth/configuration-not-found':'Firebase Auth non activé. Activez Email/Password dans la console Firebase.',
+    };
+    showErr(FR[e.code] || 'Erreur (' + e.code + ') : ' + e.message);
+    console.error(e.code, e.message);
+  }
+}
+
+// Entrée = login
+['loginEmail','loginPwd'].forEach(id =>
+  document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); })
+);
+
+function doLogout() { auth.signOut(); }
+function showErr(msg) { const el = document.getElementById('loginErr'); el.textContent = msg; el.style.display = 'block'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+function togglePwd() {
+  const i = document.getElementById('loginPwd');
+  const e = document.getElementById('eyeIco');
+  i.type = i.type==='password' ? 'text' : 'password';
+  e.className = i.type==='password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+}
+
+// ── TABS ────────────────────────────────────────────────
+const TAB_META = {
+  dashboard:    ['Tableau de bord', ''],
+  messages:     ['Messages', 'Demandes de consultation'],
+  newsletter:   ['Newsletter', 'Abonnés'],
+  realisations: ['Réalisations', 'Gérer les projets publiés'],
+  services:     ['Nos Services', 'Modifier / ajouter'],
+  projets:      ['Projets en financement', 'Portefeuille'],
+  partenaires:  ['Nos Partenaires', 'Modifier / ajouter'],
+  blog:         ['Actualités / Blog', 'Articles'],
+  brochure:     ['Brochure & Documents', 'Fichiers téléchargeables'],
+};
+
+function switchTab(name) {
+  currentTab = name;
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  // highlight sidebar link
+  document.querySelectorAll('.sidebar-nav a').forEach(a => {
+    if (a.getAttribute('onclick') && a.getAttribute('onclick').includes(`'${name}'`)) a.classList.add('active');
+  });
+  const [title, sub] = TAB_META[name] || [name, ''];
+  document.getElementById('tabTitle').textContent = title;
+  document.getElementById('tabSub').textContent   = sub;
+
+  // auto-load
+  const loaders = {
+    messages:     () => loadMessages(),
+    newsletter:   () => loadNewsletter(),
+    realisations: () => loadList('realisations_data','real'),
+    services:     () => loadList('services_data','svc'),
+    projets:      () => loadList('projets_financement','proj'),
+    partenaires:  () => loadList('partenaires_data','part'),
+    blog:         () => loadList('articles','blog'),
+    brochure:     () => { loadList('brochure_docs','broch'); loadBrochStats(); },
+    dashboard:    () => loadDashboard(),
+  };
+  if (loaders[name]) loaders[name]();
+}
+
+function refreshCurrent() { switchTab(currentTab); }
+
+function showPanel(prefix, panel) {
+  const tabMap = { real:'realisations', svc:'services', proj:'projets', part:'partenaires', blog:'blog', broch:'brochure' };
+  document.querySelectorAll(`#tab-${tabMap[prefix]} .panel`).forEach(p => p.classList.remove('active'));
+  document.getElementById(`${prefix}-${panel}`).classList.add('active');
+  document.querySelectorAll(`#tab-${tabMap[prefix]} .section-tab`).forEach(t => t.classList.remove('active'));
+  const tabs = document.querySelectorAll(`#tab-${tabMap[prefix]} .section-tab`);
+  if (panel==='list' && tabs[0]) tabs[0].classList.add('active');
+  if (panel==='add'  && tabs[1]) tabs[1].classList.add('active');
+}
+
+// ── DASHBOARD ───────────────────────────────────────────
+async function loadDashboard() {
+  const cols = ['consultations','newsletter','realisations_data','projets_financement','partenaires_data','articles'];
+  const ids  = ['db-msgs','db-news','db-real','db-proj','db-part','db-blog'];
+  try {
+    const snaps = await Promise.all(cols.map(c => db.collection(c).get()));
+    snaps.forEach((s,i) => document.getElementById(ids[i]).textContent = s.size);
+
+    const msgs   = snaps[0];
+    const unread = msgs.docs.filter(d => d.data().lu === false);
+    document.getElementById('unreadBadge').textContent = unread.length + ' nouveau' + (unread.length>1?'x':'');
+    document.getElementById('msgPill').textContent     = unread.length;
+
+    const latest = msgs.docs.sort((a,b) => (b.data().date||'').localeCompare(a.data().date||'')).slice(0,5);
+    document.getElementById('dashMsgs').innerHTML = latest.length === 0
+      ? emptyHTML('Aucun message')
+      : latest.map(d => msgRowHTML(d.id, d.data())).join('');
+  } catch(e) { document.getElementById('dashMsgs').innerHTML = errHTML(e); }
+}
+
+// ── MESSAGES ────────────────────────────────────────────
+async function loadMessages() {
+  const body = document.getElementById('msgListBody');
+  body.innerHTML = loadingHTML();
+  try {
+    const snap = await db.collection('consultations').orderBy('date','desc').get();
+    body.innerHTML = snap.empty ? emptyHTML('Aucun message reçu') : snap.docs.map(d => msgRowHTML(d.id, d.data())).join('');
+  } catch(e) { body.innerHTML = errHTML(e); }
+}
+
+function msgRowHTML(id, m) {
+  return `<div class="msg-row ${m.lu===false?'unread':''}" onclick="viewMsg('${id}')">
+    <div class="msg-avatar">${(m.nom||'?')[0].toUpperCase()}</div>
+    ${m.lu===false ? '<div class="unread-dot"></div>' : '<div style="width:7px"></div>'}
+    <div class="msg-body-wrap">
+      <div class="msg-name">${m.nom||'—'} <span style="color:var(--gray);font-weight:400;font-size:.8rem">${m.email||''}</span></div>
+      <div class="msg-service">${m.service||'Consultation'}</div>
+      <div class="msg-preview">${(m.message||'').substring(0,90)}…</div>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <div class="msg-time">${fmtD(m.date)}</div>
+      <span class="${m.lu===false?'badge-new':'badge-read'}">${m.lu===false?'Nouveau':'Lu'}</span>
+    </div>
+  </div>`;
+}
+
+async function viewMsg(id) {
+  document.getElementById('msgListWrap').style.display   = 'none';
+  document.getElementById('msgDetailWrap').style.display = 'block';
+  document.getElementById('msgDetailWrap').innerHTML = loadingHTML();
+  try {
+    const doc = await db.collection('consultations').doc(id).get();
+    const m   = doc.data();
+    if (m.lu === false) db.collection('consultations').doc(id).update({ lu:true });
+
+    document.getElementById('msgDetailWrap').innerHTML = `
+      <div class="msg-detail-wrap">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem">
+          <div class="msg-detail-meta">
+            <p><strong>De :</strong> ${m.nom||'—'} &nbsp;|&nbsp; <strong>Email :</strong> ${m.email||'—'}</p>
+            <p><strong>Téléphone :</strong> ${m.telephone||'—'} &nbsp;|&nbsp; <strong>Organisation :</strong> ${m.organisation||'—'}</p>
+            <p><strong>Service demandé :</strong> ${m.service||'—'} &nbsp;|&nbsp; <strong>Date :</strong> ${fmtD(m.date)}</p>
+          </div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+            <a href="mailto:${m.email}" class="btn-primary" target="_blank"><i class="fas fa-envelope"></i> Répondre par email</a>
+            <a href="https://wa.me/${(m.telephone||'').replace(/\D/g,'')}" class="btn-sm reply" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+            <button class="btn-sm del" onclick="delMsg('${id}')"><i class="fas fa-trash"></i> Supprimer</button>
+          </div>
+        </div>
+        <div class="msg-text">${(m.message||'').replace(/\n/g,'<br>')}</div>
+        <div class="reply-box">
+          <p style="font-size:.88rem;font-weight:700;margin-bottom:.75rem"><i class="fas fa-reply" style="color:var(--purple);margin-right:.4rem"></i>Rédiger une réponse</p>
+          <textarea id="replyTa" placeholder="Votre réponse…"></textarea>
+          <div style="margin-top:.75rem;display:flex;gap:.5rem">
+            <a id="replyBtn" href="mailto:${m.email}?subject=Réponse à votre demande — AMEXPERTS&body=" class="btn-primary"><i class="fas fa-paper-plane"></i> Ouvrir dans ma messagerie</a>
+            <button class="btn-purple-outline" onclick="backToMsgList()"><i class="fas fa-arrow-left"></i> Retour</button>
+          </div>
+        </div>
+      </div>`;
+
+    document.getElementById('replyTa').addEventListener('input', function() {
+      document.getElementById('replyBtn').href =
+        `mailto:${m.email}?subject=Réponse%20à%20votre%20demande%20—%20AMEXPERTS&body=${encodeURIComponent(this.value)}`;
+    });
+  } catch(e) { document.getElementById('msgDetailWrap').innerHTML = errHTML(e); }
+}
+
+function backToMsgList() {
+  document.getElementById('msgListWrap').style.display   = 'block';
+  document.getElementById('msgDetailWrap').style.display = 'none';
+  loadMessages();
+}
+
+async function delMsg(id) {
+  if (!confirm('Supprimer ce message ?')) return;
+  await db.collection('consultations').doc(id).delete();
+  toast('🗑️ Message supprimé');
+  backToMsgList();
+}
+
+// ── NEWSLETTER ──────────────────────────────────────────
+async function loadNewsletter() {
+  const b = document.getElementById('newsBody');
+  try {
+    const snap = await db.collection('newsletter').get();
+    b.innerHTML = snap.empty
+      ? '<tr><td colspan="3" style="text-align:center;padding:2rem;color:var(--gray)">Aucun abonné</td></tr>'
+      : snap.docs.map((d,i) => `<tr><td>${i+1}</td><td>${d.data().email}</td><td>${fmtD(d.data().date)}</td></tr>`).join('');
+  } catch(e) { b.innerHTML = `<tr><td colspan="3" style="color:red">${e.message}</td></tr>`; }
+}
+
+// ── GENERIC LIST LOADER ─────────────────────────────────
+const LIST_CFG = {
+  realisations_data: {
+    cols: ['Image','Titre','Secteur','Pays','Montant'],
+    row:  (id,d) => `<tr>
+      <td>${d.image ? `<img src="${d.image}" style="width:50px;height:35px;object-fit:cover;border-radius:3px">` : '<span style="color:var(--gray);font-size:.8rem">—</span>'}</td>
+      <td><strong>${d.titre||'—'}</strong></td><td>${d.secteur||'—'}</td><td>${d.pays||'—'}</td><td>${d.montant||'—'}</td>
+      <td><div class="actions"><button class="btn-sm edit" onclick="editDoc('${id}','realisations_data','real')"><i class="fas fa-edit"></i></button><button class="btn-sm del" onclick="delDoc('${id}','realisations_data','real')"><i class="fas fa-trash"></i></button></div></td></tr>`
+  },
+  services_data: {
+    cols: ['Icône','Titre','Description'],
+    row:  (id,d) => `<tr>
+      <td>${d.image ? `<img src="${d.image}" style="width:40px;height:30px;object-fit:cover;border-radius:3px">` : `<i class="${d.icon||'fas fa-star'}" style="color:var(--purple);font-size:1.2rem"></i>`}</td>
+      <td><strong>${d.titre||'—'}</strong></td>
+      <td style="max-width:300px;color:var(--gray);font-size:.83rem">${(d.description||'').substring(0,80)}…</td>
+      <td><div class="actions"><button class="btn-sm edit" onclick="editDoc('${id}','services_data','svc')"><i class="fas fa-edit"></i></button><button class="btn-sm del" onclick="delDoc('${id}','services_data','svc')"><i class="fas fa-trash"></i></button></div></td></tr>`
+  },
+  projets_financement: {
+    cols: ['Réf.','Titre','Secteur','Montant','Statut'],
+    row:  (id,d) => {
+      const bmap = {open:'badge-open',progress:'badge-prog',closed:'badge-closed'};
+      const lmap = {open:'Ouvert',progress:'En cours',closed:'Clôturé'};
+      return `<tr>
+        <td><strong>${d.ref||'—'}</strong></td><td>${d.titre||'—'}</td><td>${d.secteur||'—'}</td><td>${d.montant||'—'}</td>
+        <td><span class="${bmap[d.statut]||'badge-read'}">${lmap[d.statut]||d.statut||'—'}</span></td>
+        <td><div class="actions"><button class="btn-sm edit" onclick="editDoc('${id}','projets_financement','proj')"><i class="fas fa-edit"></i></button><button class="btn-sm del" onclick="delDoc('${id}','projets_financement','proj')"><i class="fas fa-trash"></i></button></div></td></tr>`;
+    }
+  },
+  partenaires_data: {
+    cols: ['Logo','Nom','Type','Pays'],
+    row:  (id,d) => `<tr>
+      <td>${d.logo ? `<img src="${d.logo}" style="width:45px;height:32px;object-fit:contain;border-radius:3px;background:#f0ecf5;padding:2px">` : '<span style="color:var(--gray)">—</span>'}</td>
+      <td><strong>${d.nom||'—'}</strong></td><td>${d.type||'—'}</td><td>${d.pays||'—'}</td>
+      <td><div class="actions"><button class="btn-sm edit" onclick="editDoc('${id}','partenaires_data','part')"><i class="fas fa-edit"></i></button><button class="btn-sm del" onclick="delDoc('${id}','partenaires_data','part')"><i class="fas fa-trash"></i></button></div></td></tr>`
+  },
+  articles: {
+    cols: ['Image','Titre','Catégorie','Date'],
+    row:  (id,d) => `<tr>
+      <td>${d.image ? `<img src="${d.image}" style="width:50px;height:35px;object-fit:cover;border-radius:3px">` : `<span style="font-size:1.4rem">${d.icon||'📰'}</span>`}</td>
+      <td><strong>${d.titre||'—'}</strong></td><td>${d.cat||'—'}</td><td>${fmtD(d.date)}</td>
+      <td><div class="actions"><button class="btn-sm edit" onclick="editDoc('${id}','articles','blog')"><i class="fas fa-edit"></i></button><button class="btn-sm del" onclick="delDoc('${id}','articles','blog')"><i class="fas fa-trash"></i></button></div></td></tr>`
+  },
+  brochure_docs: {
+    cols: ['Titre','Type','Taille','Accès','Lien'],
+    row:  (id,d) => `<tr>
+      <td><strong>${d.titre||'—'}</strong></td><td>${d.type||'—'}</td><td>${d.taille||'—'}</td>
+      <td>${d.acces==='direct'?'Direct':'Sur demande'}</td>
+      <td>${d.url ? `<a href="${d.url}" target="_blank" class="btn-sm view"><i class="fas fa-external-link-alt"></i> Ouvrir</a>` : '—'}</td>
+      <td><div class="actions"><button class="btn-sm edit" onclick="editDoc('${id}','brochure_docs','broch')"><i class="fas fa-edit"></i></button><button class="btn-sm del" onclick="delDoc('${id}','brochure_docs','broch')"><i class="fas fa-trash"></i></button></div></td></tr>`
+  },
+};
+
+async function loadList(col, prefix) {
+  const bodyId = prefix + 'ListBody';
+  const body   = document.getElementById(bodyId);
+  if (!body) return;
+  body.innerHTML = loadingHTML();
+  try {
+    const snap = await db.collection(col).orderBy('date','desc').get().catch(() => db.collection(col).get());
+    if (snap.empty) { body.innerHTML = emptyHTML('Aucun élément publié'); return; }
+    const cfg = LIST_CFG[col];
+    const thead = cfg.cols.map(c=>`<th>${c}</th>`).join('') + '<th>Actions</th>';
+    const tbody = snap.docs.map(d => cfg.row(d.id, d.data())).join('');
+    body.innerHTML = `<table class="admin-table"><thead><tr>${thead}</tr></thead><tbody>${tbody}</tbody></table>`;
+  } catch(e) { body.innerHTML = errHTML(e); }
+}
+
+// ── SAVE DOC ────────────────────────────────────────────
+async function saveDoc(e, col, prefix) {
+  e.preventDefault();
+  const btn = e.target.querySelector('[type="submit"]');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+  btn.disabled  = true;
+
+  const data = collectData(prefix);
+  data.date  = new Date().toISOString();
+
+  try {
+    const idEl  = document.getElementById(prefix + 'DocId');
+    const docId = idEl ? idEl.value : '';
+    if (docId) {
+      await db.collection(col).doc(docId).set(data, { merge:true });
+      idEl.value = '';
+    } else {
+      await db.collection(col).add(data);
+    }
+    toast('✅ Publié avec succès !');
+    e.target.reset();
+    // reset previews
+    document.querySelectorAll(`#${prefix}-add .media-preview`).forEach(p => {
+      p.innerHTML = '<div class="no-img"><i class="fas fa-image"></i>Aperçu</div>';
+    });
+    document.querySelectorAll(`#${prefix}-add .file-preview`).forEach(p => p.style.display='none');
+    // reload list
+    const colMap = { real:'realisations_data', svc:'services_data', proj:'projets_financement', part:'partenaires_data', blog:'articles', broch:'brochure_docs' };
+    showPanel(prefix, 'list');
+    loadList(colMap[prefix], prefix);
+  } catch(e) {
+    toast('❌ Erreur : ' + e.message, 'err');
+    console.error(e);
+  } finally {
+    btn.innerHTML = orig;
+    btn.disabled  = false;
+  }
+}
+
+// ── COLLECT FORM DATA ───────────────────────────────────
+function collectData(prefix) {
+  const v = id => (document.getElementById(id)||{}).value || '';
+  const maps = {
+    real:  { titre:v('realTitre'), secteur:v('realSecteur'), pays:v('realPays'), montant:v('realMontant'), annee:v('realAnnee'), cat:v('realCat'), description:v('realDesc'), image:v('realImg') },
+    svc:   { titre:v('svcTitre'), icon:v('svcIcon'), description:v('svcDesc'), points:v('svcPoints').split('\n').filter(Boolean), image:v('svcImg') },
+    proj:  { ref:v('projRef'), titre:v('projTitre'), secteur:v('projSecteur'), montant:v('projMontant'), pays:v('projPays'), statut:v('projStatut'), pct:v('projPct'), contact:v('projContact'), description:v('projDesc'), image:v('projImg'), document:v('projDoc') },
+    part:  { nom:v('partNom'), type:v('partType'), pays:v('partPays'), site:v('partSite'), description:v('partDesc'), logo:v('partLogo') },
+    blog:  { titre:v('blogTitre'), cat:v('blogCat'), icon:v('blogIcon'), date:v('blogDate'), extrait:v('blogExtrait'), contenu:v('blogContenu'), image:v('blogImg'), document:v('blogDoc') },
+    broch: { titre:v('brochTitre'), type:v('brochType'), taille:v('brochSize'), acces:v('brochAcces'), description:v('brochDesc'), url:v('brochUrl'), image:v('brochImg') },
+  };
+  return maps[prefix] || {};
+}
+
+// ── EDIT DOC (charge les données dans le formulaire) ────
+async function editDoc(id, col, prefix) {
+  const tabMap = { real:'realisations', svc:'services', proj:'projets', part:'partenaires', blog:'blog', broch:'brochure' };
+  switchTab(tabMap[prefix]);
+  setTimeout(() => showPanel(prefix,'add'), 50);
+
+  try {
+    const doc  = await db.collection(col).doc(id).get();
+    const d    = doc.data();
+    const v    = (field, val) => { const el = document.getElementById(field); if(el) el.value = val||''; };
+    const prev = (imgId, prevId, url) => { if(url) { v(imgId, url); previewMedia(imgId, prevId); } };
+    const fp   = (urlId, prevId, nameId, typeId, linkId, url) => { if(url) { v(urlId, url); previewFile(urlId, prevId, nameId, typeId, linkId); } };
+
+    document.getElementById(prefix+'DocId').value = id;
+
+    if (prefix==='real') {
+      v('realTitre',d.titre); v('realSecteur',d.secteur); v('realPays',d.pays); v('realMontant',d.montant);
+      v('realAnnee',d.annee); v('realCat',d.cat); v('realDesc',d.description);
+      prev('realImg','realImgPrev',d.image);
+      document.getElementById('realFormTitle').textContent = 'Modifier la réalisation';
+    }
+    if (prefix==='svc') {
+      v('svcTitre',d.titre); v('svcIcon',d.icon); v('svcDesc',d.description);
+      v('svcPoints',(d.points||[]).join('\n'));
+      prev('svcImg','svcImgPrev',d.image);
+      document.getElementById('svcFormTitle').textContent = 'Modifier le service';
+    }
+    if (prefix==='proj') {
+      v('projRef',d.ref); v('projTitre',d.titre); v('projSecteur',d.secteur); v('projMontant',d.montant);
+      v('projPays',d.pays); v('projStatut',d.statut); v('projPct',d.pct); v('projContact',d.contact); v('projDesc',d.description);
+      prev('projImg','projImgPrev',d.image);
+      fp('projDoc','projDocPrev','projDocName','projDocType','projDocLink',d.document);
+      document.getElementById('projFormTitle').textContent = 'Modifier le projet';
+    }
+    if (prefix==='part') {
+      v('partNom',d.nom); v('partType',d.type); v('partPays',d.pays); v('partSite',d.site); v('partDesc',d.description);
+      prev('partLogo','partLogoPrev',d.logo);
+      document.getElementById('partFormTitle').textContent = 'Modifier le partenaire';
+    }
+    if (prefix==='blog') {
+      v('blogTitre',d.titre); v('blogCat',d.cat); v('blogIcon',d.icon);
+      v('blogDate',(d.date||'').substring(0,10)); v('blogExtrait',d.extrait); v('blogContenu',d.contenu);
+      prev('blogImg','blogImgPrev',d.image);
+      fp('blogDoc','blogDocPrev','blogDocName','blogDocType','blogDocLink',d.document);
+      document.getElementById('blogFormTitle').textContent = 'Modifier l\'article';
+    }
+    if (prefix==='broch') {
+      v('brochTitre',d.titre); v('brochType',d.type); v('brochSize',d.taille);
+      v('brochAcces',d.acces); v('brochDesc',d.description);
+      fp('brochUrl','brochFilePrev','brochFileName','brochFileType','brochFileLink',d.url);
+      prev('brochImg','brochImgPrev',d.image);
+      document.getElementById('brochFormTitle').textContent = 'Modifier le document';
+    }
+  } catch(e) { toast('❌ Erreur chargement : '+e.message,'err'); }
+}
+
+// ── DELETE DOC ──────────────────────────────────────────
+async function delDoc(id, col, prefix) {
+  if (!confirm('Supprimer définitivement cet élément ?')) return;
+  try {
+    await db.collection(col).doc(id).delete();
+    toast('🗑️ Supprimé');
+    const colMap = { real:'realisations_data', svc:'services_data', proj:'projets_financement', part:'partenaires_data', blog:'articles', broch:'brochure_docs' };
+    loadList(colMap[prefix], prefix);
+  } catch(e) { toast('❌ Erreur : '+e.message,'err'); }
+}
+
+// ── BROCHURE STATS ──────────────────────────────────────
+async function loadBrochStats() {
+  const el = document.getElementById('brochStats');
+  if (!el) return;
+  try {
+    const snap = await db.collection('brochure_downloads').get();
+    el.innerHTML = `<strong>${snap.size}</strong> téléchargement${snap.size>1?'s':''} enregistré${snap.size>1?'s':''}.`;
+  } catch { el.textContent = 'Impossible de charger les statistiques.'; }
+}
+
+// ── MEDIA PREVIEW ───────────────────────────────────────
+function previewMedia(inputId, previewId) {
+  const url  = document.getElementById(inputId)?.value || '';
+  const prev = document.getElementById(previewId);
+  if (!prev) return;
+  if (url) {
+    prev.innerHTML = `<img src="${url}" onerror="this.parentElement.innerHTML='<div class=\\'no-img\\'><i class=\\'fas fa-exclamation-triangle\\'></i>Image non accessible</div>'" alt="aperçu">`;
+  } else {
+    prev.innerHTML = '<div class="no-img"><i class="fas fa-image"></i>Aperçu de l\'image</div>';
+  }
+}
+
+function previewFile(inputId, previewId) {
+  const url  = (document.getElementById(inputId)||{}).value || '';
+  const prev = document.getElementById(previewId);
+  if (!prev) return;
+  if (!url) { prev.style.display='none'; return; }
+
+  // detect type
+  let icon = 'fas fa-file', label = 'Document', ftype = 'Lien externe';
+  if (/youtube\.com|youtu\.be/i.test(url))         { icon='fab fa-youtube'; label='Vidéo YouTube'; ftype='Vidéo'; }
+  else if (/vimeo\.com/i.test(url))                { icon='fab fa-vimeo'; label='Vidéo Vimeo'; ftype='Vidéo'; }
+  else if (/\.pdf($|\?)/i.test(url))               { icon='fas fa-file-pdf'; label='Document PDF'; ftype='PDF'; }
+  else if (/\.mp4($|\?)/i.test(url))               { icon='fas fa-file-video'; label='Vidéo MP4'; ftype='MP4'; }
+  else if (/drive\.google\.com/i.test(url))        { icon='fab fa-google-drive'; label='Google Drive'; ftype='Google Drive'; }
+  else if (/dropbox\.com/i.test(url))              { icon='fab fa-dropbox'; label='Dropbox'; ftype='Dropbox'; }
+
+  prev.style.display = 'flex';
+  prev.querySelector('i').className       = icon;
+  const fname = prev.querySelector('[id$="Name"]') || prev.querySelector('.fname');
+  const ftype2 = prev.querySelector('[id$="Type"]') || prev.querySelector('.ftype');
+  const flink  = prev.querySelector('[id$="Link"]') || prev.querySelector('a');
+  if (fname)  fname.textContent  = label;
+  if (ftype2) ftype2.textContent = ftype;
+  if (flink)  { flink.href = url; }
+}
+
+// ── UTILS ───────────────────────────────────────────────
+function val(id) { return (document.getElementById(id)||{}).value?.trim() || ''; }
+function fmtD(s) {
+  if (!s) return '—';
+  try { return new Date(s).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'}); }
+  catch { return s; }
+}
+function loadingHTML() { return '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Chargement…</p></div>'; }
+function emptyHTML(msg){ return `<div class="empty-state"><i class="fas fa-inbox"></i><p>${msg}</p></div>`; }
+function errHTML(e)    { return `<div class="empty-state" style="color:#c62828"><i class="fas fa-exclamation-circle"></i><p>${e.message}</p></div>`; }
+
+function toast(msg, type='ok') {
+  const el = document.getElementById('adminToast');
+  el.textContent = msg;
+  el.style.background = type==='err' ? '#c62828' : '#2e7d32';
+  el.style.color = '#fff';
+  el.style.opacity = '1';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.style.opacity='0', 3500);
+}
+</script>
+</body>
+</html>
