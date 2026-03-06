@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>À propos — AMEXPERTS &amp; PARTNERS</title>
+  <meta name="description" content="Découvrez AMEXPERTS & PARTNERS : notre histoire, vision, mission, valeurs et équipe dirigeante. Cabinet de conseil basé à Lomé, Togo.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<!-- ═══════════════ NAVBAR ═══════════════ -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><img src="logo_nom.png" alt="AMEXPERTS &amp; PARTNERS"></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html" data-i18n="nav_home">Accueil</a></li>
+      <li><a href="about.html" class="active" data-i18n="nav_about">À propos</a></li>
+      <li class="dropdown">
+        <a href="service.html" data-i18n="nav_services">Nos Services <i class="fas fa-chevron-down" style="font-size:.7em"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="service.html#redaction" data-i18n="nav_s1">Rédaction de projets</a></li>
+          <li><a href="service.html#mobilisation" data-i18n="nav_s2">Mobilisation de ressources</a></li>
+          <li><a href="service.html#formations" data-i18n="nav_s3">Formations professionnelles</a></li>
+          <li><a href="service.html#structuration" data-i18n="nav_s4">Structuration financière</a></li>
+          <li><a href="service.html#immobilier" data-i18n="nav_s5">Expertise immobilière</a></li>
+          <li><a href="service.html#industriel" data-i18n="nav_s6">Expertise industrielle</a></li>
+          <li><a href="service.html#assurance" data-i18n="nav_s7">Expertise en assurance</a></li>
+          <li><a href="service.html#juridique" data-i18n="nav_s8">Ingénierie juridique</a></li>
+        </ul>
+      </li>
+      <li><a href="realisation.html" data-i18n="nav_realisations">Réalisations</a></li>
+      <li><a href="blog.html" data-i18n="nav_blog">Actualités</a></li>
+      <li class="dropdown">
+        <a href="#" data-i18n="nav_options">Options <i class="fas fa-chevron-down" style="font-size:.7em"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="projet_finance.html" data-i18n="nav_drop1">Projets en financement</a></li>
+          <li><a href="partenaires.html" data-i18n="nav_drop2">Nos Partenaires</a></li>
+          <li><a href="brochure.html" data-i18n="nav_drop3">Brochure Corporate</a></li>
+        </ul>
+      </li>
+      <li><a href="index.html#contact" class="nav-cta" data-i18n="nav_cta">Consultation</a></li>
+    </ul>
+    <div style="display:flex;align-items:center;gap:.6rem">
+      <button class="lang-btn" data-lang="fr">FR</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════ PAGE HEADER ═══════════════ -->
+<div class="page-header">
+  <div class="breadcrumb">
+    <a href="index.html" data-i18n="nav_home">Accueil</a>
+    <i class="fas fa-angle-right"></i>
+    <span data-i18n="about_bc">À propos</span>
+  </div>
+  <h1 data-i18n="about_ph_h1">À propos du cabinet</h1>
+  <p data-i18n="about_ph_p">Un cabinet pluridisciplinaire fondé sur l'excellence, l'intégrité et la vision internationale.</p>
+</div>
+
+<!-- ═══════════════ HISTOIRE & MISSION ═══════════════ -->
+<section>
+  <div class="section-inner">
+    <div class="why-grid">
+      <div class="fade-up">
+        <span class="section-label" data-i18n="about_hist_label">Notre histoire</span>
+        <h2 data-i18n="about_hist_h2">Nés de l'Afrique, tournés vers le monde</h2>
+        <p style="margin:1.25rem 0;line-height:1.9" data-i18n="about_hist_p1">AMEXPERTS AND PARTNERS est un cabinet de conseil et d'ingénierie de projets basé à Lomé, en République du Togo. Fondé par des experts chevronnés issus de la finance internationale, de l'ingénierie et du droit des affaires, le cabinet s'est imposé comme un acteur de référence dans l'accompagnement de projets d'envergure en Afrique de l'Ouest, Centrale et à l'international.</p>
+        <p style="line-height:1.9" data-i18n="about_hist_p2">Notre approche combine rigueur analytique, créativité stratégique et maîtrise des réalités locales pour offrir à nos clients des solutions de financement et de structuration à la hauteur de leurs ambitions.</p>
+        <div style="display:flex;gap:2rem;margin-top:2.5rem;flex-wrap:wrap">
+          <div style="text-align:center">
+            <div style="font-family:var(--font-serif);font-size:2.8rem;font-weight:700;color:var(--purple);line-height:1" class="counter" data-target="10" data-suffix="+">0+</div>
+            <div style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray);margin-top:0.3rem" data-i18n="about_stat1">Années d'expérience</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-family:var(--font-serif);font-size:2.8rem;font-weight:700;color:var(--purple);line-height:1" class="counter" data-target="200" data-suffix="+">0+</div>
+            <div style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray);margin-top:0.3rem" data-i18n="about_stat2">Projets réalisés</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-family:var(--font-serif);font-size:2.8rem;font-weight:700;color:var(--purple);line-height:1" class="counter" data-target="15" data-suffix="+">0+</div>
+            <div style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray);margin-top:0.3rem" data-i18n="about_stat3">Pays d'intervention</div>
+          </div>
+        </div>
+      </div>
+      <div class="fade-up">
+        <div style="background:var(--bg-light);border-radius:8px;padding:3rem;border-left:4px solid var(--purple)">
+          <h3 style="margin-bottom:1.5rem;font-size:1.4rem" data-i18n="about_vision_h3">Notre vision</h3>
+          <p style="font-size:1.05rem;line-height:1.9;color:var(--gray-dark);font-style:italic" data-i18n="about_vision_q">« Devenir le cabinet de référence en ingénierie de projets et en structuration financière pour le développement économique de l'Afrique, en mobilisant les meilleures expertises humaines, techniques et financières. »</p>
+          <div style="height:1px;background:#e8e4ec;margin:2rem 0"></div>
+          <h3 style="margin-bottom:1rem;font-size:1.2rem" data-i18n="about_mission_h3">Notre mission</h3>
+          <p style="line-height:1.8" data-i18n="about_mission_p">Accompagner les entreprises, institutions et investisseurs dans la conception, la structuration et la réalisation de leurs projets, en leur offrant un conseil expert, intègre et orienté résultats.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ VALEURS ═══════════════ -->
+<section style="background:var(--bg-light)">
+  <div class="section-inner">
+    <div style="text-align:center;margin-bottom:3.5rem">
+      <span class="section-label" data-i18n="about_val_label">Ce qui nous guide</span>
+      <h2 data-i18n="about_val_h2">Nos valeurs fondamentales</h2>
+    </div>
+    <div class="values-grid">
+      <div class="value-card fade-up">
+        <div class="icon"><i class="fas fa-gem"></i></div>
+        <h3 data-i18n="about_v1_h">Excellence</h3>
+        <p data-i18n="about_v1_p">Nous visons la plus haute qualité dans chaque mission, en mobilisant les meilleurs experts et en appliquant les standards internationaux.</p>
+      </div>
+      <div class="value-card fade-up">
+        <div class="icon"><i class="fas fa-balance-scale"></i></div>
+        <h3 data-i18n="about_v2_h">Intégrité</h3>
+        <p data-i18n="about_v2_p">Notre éthique professionnelle est au cœur de toutes nos interventions. Nous traitons chaque dossier avec transparence et honnêteté.</p>
+      </div>
+      <div class="value-card fade-up">
+        <div class="icon"><i class="fas fa-lightbulb"></i></div>
+        <h3 data-i18n="about_v3_h">Innovation</h3>
+        <p data-i18n="about_v3_p">Nous développons des solutions créatives et adaptées aux défis spécifiques de chaque client, en anticipant les évolutions des marchés.</p>
+      </div>
+      <div class="value-card fade-up">
+        <div class="icon"><i class="fas fa-handshake"></i></div>
+        <h3 data-i18n="about_v4_h">Partenariat</h3>
+        <p data-i18n="about_v4_p">Nous construisons des relations durables avec nos clients, fondées sur la confiance, le respect mutuel et la création de valeur partagée.</p>
+      </div>
+      <div class="value-card fade-up">
+        <div class="icon"><i class="fas fa-globe-africa"></i></div>
+        <h3 data-i18n="about_v5_h">Impact africain</h3>
+        <p data-i18n="about_v5_p">Nous contribuons activement au développement économique de l'Afrique en catalysant des investissements structurants et créateurs d'emplois.</p>
+      </div>
+      <div class="value-card fade-up">
+        <div class="icon"><i class="fas fa-lock"></i></div>
+        <h3 data-i18n="about_v6_h">Confidentialité</h3>
+        <p data-i18n="about_v6_p">Toutes nos missions sont traitées avec la plus stricte confidentialité. La protection de vos informations stratégiques est notre priorité.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ÉQUIPE ═══════════════ -->
+<section>
+  <div class="section-inner">
+    <div style="text-align:center;margin-bottom:3.5rem">
+      <span class="section-label" data-i18n="about_team_label">Notre équipe</span>
+      <h2 data-i18n="about_team_h2">Des experts à votre service</h2>
+      <p style="max-width:600px;margin:1rem auto;color:var(--gray)" data-i18n="about_team_p">Une équipe pluridisciplinaire d'experts en finance, droit, ingénierie et stratégie d'entreprise au service de vos projets.</p>
+    </div>
+    <div class="team-grid">
+      <div class="team-card fade-up">
+        <div class="avatar"><i class="fas fa-user-tie"></i></div>
+        <div class="team-info">
+          <h3 data-i18n="about_team1_h">Direction Générale</h3>
+          <div class="role" data-i18n="about_team1_role">Directeur Général</div>
+          <p data-i18n="about_team1_p">Expert en ingénierie financière et structuration de projets d'investissement. Plus de 15 ans d'expérience en Afrique et en Europe.</p>
+        </div>
+      </div>
+      <div class="team-card fade-up">
+        <div class="avatar"><i class="fas fa-user-tie"></i></div>
+        <div class="team-info">
+          <h3 data-i18n="about_team2_h">Département Juridique</h3>
+          <div class="role" data-i18n="about_team2_role">Responsable Juridique &amp; Compliance</div>
+          <p data-i18n="about_team2_p">Spécialiste du droit des affaires africain, des partenariats public-privé et de la structuration contractuelle d'opérations complexes.</p>
+        </div>
+      </div>
+      <div class="team-card fade-up">
+        <div class="avatar"><i class="fas fa-user-tie"></i></div>
+        <div class="team-info">
+          <h3 data-i18n="about_team3_h">Département Finance</h3>
+          <div class="role" data-i18n="about_team3_role">Analyste Financier Senior</div>
+          <p data-i18n="about_team3_p">Expert en modélisation financière, analyse de risques et structuration de dette. Formation école de commerce internationale.</p>
+        </div>
+      </div>
+      <div class="team-card fade-up">
+        <div class="avatar"><i class="fas fa-user-tie"></i></div>
+        <div class="team-info">
+          <h3 data-i18n="about_team4_h">Département Technique</h3>
+          <div class="role" data-i18n="about_team4_role">Ingénieur Expert</div>
+          <p data-i18n="about_team4_p">Spécialiste de l'expertise industrielle et immobilière. Certifié en évaluation d'actifs et audit technique.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ÉTHIQUE ═══════════════ -->
+<section style="background:var(--black);color:#fff">
+  <div class="section-inner" style="text-align:center">
+    <span class="section-label" style="color:var(--purple-light)" data-i18n="about_eth_label">Notre engagement</span>
+    <h2 style="color:#fff;margin-bottom:1.5rem" data-i18n="about_eth_h2">Éthique &amp; Responsabilité</h2>
+    <p style="color:rgba(255,255,255,0.7);max-width:700px;margin:0 auto 3rem;font-size:1.05rem;line-height:1.9" data-i18n="about_eth_p">AMEXPERTS &amp; PARTNERS s'engage à exercer son activité dans le strict respect des principes déontologiques et des standards internationaux en matière de lutte contre la corruption, de protection des données et de responsabilité sociale.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem;max-width:900px;margin:0 auto">
+      <div style="padding:1.5rem;background:rgba(255,255,255,0.04);border-radius:4px;border:1px solid rgba(255,255,255,0.08)">
+        <i class="fas fa-shield-alt" style="font-size:1.5rem;color:var(--purple-light);margin-bottom:0.75rem;display:block"></i>
+        <div style="font-size:0.85rem;color:rgba(255,255,255,0.7)" data-i18n="about_eth1">Conformité réglementaire</div>
+      </div>
+      <div style="padding:1.5rem;background:rgba(255,255,255,0.04);border-radius:4px;border:1px solid rgba(255,255,255,0.08)">
+        <i class="fas fa-lock" style="font-size:1.5rem;color:var(--purple-light);margin-bottom:0.75rem;display:block"></i>
+        <div style="font-size:0.85rem;color:rgba(255,255,255,0.7)" data-i18n="about_eth2">Protection des données</div>
+      </div>
+      <div style="padding:1.5rem;background:rgba(255,255,255,0.04);border-radius:4px;border:1px solid rgba(255,255,255,0.08)">
+        <i class="fas fa-handshake" style="font-size:1.5rem;color:var(--purple-light);margin-bottom:0.75rem;display:block"></i>
+        <div style="font-size:0.85rem;color:rgba(255,255,255,0.7)" data-i18n="about_eth3">Conflits d'intérêts</div>
+      </div>
+      <div style="padding:1.5rem;background:rgba(255,255,255,0.04);border-radius:4px;border:1px solid rgba(255,255,255,0.08)">
+        <i class="fas fa-leaf" style="font-size:1.5rem;color:var(--purple-light);margin-bottom:0.75rem;display:block"></i>
+        <div style="font-size:0.85rem;color:rgba(255,255,255,0.7)" data-i18n="about_eth4">Responsabilité sociale</div>
+      </div>
+    </div>
+    <a href="index.html#contact" class="btn-primary" style="margin-top:3rem;display:inline-flex">
+      <i class="fas fa-calendar-check"></i>&nbsp;<span data-i18n="about_eth_btn">Prendre contact</span>
+    </a>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="brand-name">AMEXPERTS &amp; PARTNERS</span>
+      <p data-i18n="foot_tagline">Cabinet de conseil et d'ingénierie de projets. Expertises industrielles, techniques, de négoces et de représentation.</p>
+      <p style="margin-top:.75rem;font-size:.8rem" data-i18n="foot_city">Lomé, Togo · Afrique de l'Ouest &amp; International</p>
+      <form id="newsletterForm" style="margin-top:1.5rem">
+        <p style="font-size:.78rem;margin-bottom:.6rem;color:rgba(255,255,255,.5)" data-i18n="foot_nl">Newsletter — Analyses &amp; Opportunités</p>
+        <div style="display:flex;gap:.4rem">
+          <input type="email" data-i18n-ph="foot_nl_ph" placeholder="Votre email"
+            style="flex:1;padding:.5rem .75rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:#fff;border-radius:3px;font-family:var(--font-sans);font-size:.82rem;outline:none">
+          <button type="submit" style="padding:.5rem .9rem;background:var(--purple);color:#fff;border:none;cursor:pointer;border-radius:3px;font-size:.82rem;font-family:var(--font-sans)">OK</button>
+        </div>
+      </form>
+    </div>
+    <div class="footer-col">
+      <h4 data-i18n="foot_h_svc">Services</h4>
+      <ul>
+        <li><a href="service.html#redaction" data-i18n="foot_s1">Rédaction de projets</a></li>
+        <li><a href="service.html#mobilisation" data-i18n="foot_s2">Mobilisation de ressources</a></li>
+        <li><a href="service.html#structuration" data-i18n="foot_s3">Structuration financière</a></li>
+        <li><a href="service.html#immobilier" data-i18n="foot_s4">Expertise immobilière</a></li>
+        <li><a href="service.html#juridique" data-i18n="foot_s5">Ingénierie juridique</a></li>
+        <li><a href="service.html#formations" data-i18n="foot_s6">Formations</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4 data-i18n="foot_h_nav">Navigation</h4>
+      <ul>
+        <li><a href="index.html" data-i18n="nav_home">Accueil</a></li>
+        <li><a href="about.html" data-i18n="nav_about">À propos</a></li>
+        <li><a href="realisation.html" data-i18n="nav_realisations">Réalisations</a></li>
+        <li><a href="blog.html" data-i18n="foot_n_blog">Actualités &amp; Blog</a></li>
+        <li><a href="partenaires.html" data-i18n="foot_n_part">Nos Partenaires</a></li>
+        <li><a href="projet_finance.html" data-i18n="foot_n_proj">Projets en financement</a></li>
+        <li><a href="brochure.html" data-i18n="foot_n_broch">Brochure</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4 data-i18n="foot_h_contact">Contact</h4>
+      <ul>
+        <li><a href="tel:+22899468126">+228 99 46 81 26</a></li>
+        <li><a href="tel:+41779885166">+41 77 988 51 66</a></li>
+        <li><a href="mailto:contact@amexpertspartners.com">contact@amexpertspartners.com</a></li>
+        <li><a href="https://wa.me/22899468126">WhatsApp Business</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p data-i18n="foot_copy">© 2026 AMEXPERTS AND PARTNERS — Tous droits réservés | Ref. 71/62029/DG/AM&amp;P</p>
+    <div class="footer-social">
+      <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+      <a href="https://wa.me/22899468126" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+    </div>
+  </div>
+</footer>
+
+<a href="https://wa.me/22899468126" class="whatsapp-float" target="_blank"><i class="fab fa-whatsapp"></i></a>
+
+<!-- ══════════════════════════════════════════════
+     1. TRADUCTION — DOIT S'EXÉCUTER EN PREMIER
+     ══════════════════════════════════════════════ -->
+<script>
+(function(){
+'use strict';
+var D={
+fr:{
+  nav_home:'Accueil',nav_about:'À propos',
+  nav_services:'Nos Services <i class="fas fa-chevron-down" style="font-size:.7em"></i>',
+  nav_realisations:'Réalisations',nav_blog:'Actualités',
+  nav_options:'Options <i class="fas fa-chevron-down" style="font-size:.7em"></i>',
+  nav_cta:'Consultation',
+  nav_s1:'Rédaction de projets',nav_s2:'Mobilisation de ressources',
+  nav_s3:'Formations professionnelles',nav_s4:'Structuration financière',
+  nav_s5:'Expertise immobilière',nav_s6:'Expertise industrielle',
+  nav_s7:'Expertise en assurance',nav_s8:'Ingénierie juridique',
+  nav_drop1:'Projets en financement',nav_drop2:'Nos Partenaires',nav_drop3:'Brochure Corporate',
+  foot_h_svc:'Services',foot_h_nav:'Navigation',foot_h_contact:'Contact',
+  foot_tagline:"Cabinet de conseil et d'ingénierie de projets. Expertises industrielles, techniques, de négoces et de représentation.",
+  foot_city:"Lomé, Togo · Afrique de l'Ouest &amp; International",
+  foot_nl:'Newsletter — Analyses &amp; Opportunités',foot_nl_ph:'Votre email',
+  foot_s1:'Rédaction de projets',foot_s2:'Mobilisation de ressources',
+  foot_s3:'Structuration financière',foot_s4:'Expertise immobilière',
+  foot_s5:'Ingénierie juridique',foot_s6:'Formations',
+  foot_n_blog:'Actualités &amp; Blog',foot_n_part:'Nos Partenaires',
+  foot_n_proj:'Projets en financement',foot_n_broch:'Brochure',
+  foot_copy:'© 2026 AMEXPERTS AND PARTNERS — Tous droits réservés | Ref. 71/62029/DG/AM&amp;P',
+  about_bc:'À propos',
+  about_ph_h1:'À propos du cabinet',
+  about_ph_p:"Un cabinet pluridisciplinaire fondé sur l'excellence, l'intégrité et la vision internationale.",
+  about_hist_label:'Notre histoire',
+  about_hist_h2:"Nés de l'Afrique, tournés vers le monde",
+  about_hist_p1:"AMEXPERTS AND PARTNERS est un cabinet de conseil et d'ingénierie de projets basé à Lomé, en République du Togo. Fondé par des experts chevronnés issus de la finance internationale, de l'ingénierie et du droit des affaires, le cabinet s'est imposé comme un acteur de référence dans l'accompagnement de projets d'envergure en Afrique de l'Ouest, Centrale et à l'international.",
+  about_hist_p2:"Notre approche combine rigueur analytique, créativité stratégique et maîtrise des réalités locales pour offrir à nos clients des solutions de financement et de structuration à la hauteur de leurs ambitions.",
+  about_stat1:"Années d'expérience",about_stat2:'Projets réalisés',about_stat3:"Pays d'intervention",
+  about_vision_h3:'Notre vision',
+  about_vision_q:"« Devenir le cabinet de référence en ingénierie de projets et en structuration financière pour le développement économique de l'Afrique, en mobilisant les meilleures expertises humaines, techniques et financières. »",
+  about_mission_h3:'Notre mission',
+  about_mission_p:"Accompagner les entreprises, institutions et investisseurs dans la conception, la structuration et la réalisation de leurs projets, en leur offrant un conseil expert, intègre et orienté résultats.",
+  about_val_label:'Ce qui nous guide',about_val_h2:'Nos valeurs fondamentales',
+  about_v1_h:'Excellence',
+  about_v1_p:'Nous visons la plus haute qualité dans chaque mission, en mobilisant les meilleurs experts et en appliquant les standards internationaux.',
+  about_v2_h:'Intégrité',
+  about_v2_p:'Notre éthique professionnelle est au cœur de toutes nos interventions. Nous traitons chaque dossier avec transparence et honnêteté.',
+  about_v3_h:'Innovation',
+  about_v3_p:'Nous développons des solutions créatives et adaptées aux défis spécifiques de chaque client, en anticipant les évolutions des marchés.',
+  about_v4_h:'Partenariat',
+  about_v4_p:'Nous construisons des relations durables avec nos clients, fondées sur la confiance, le respect mutuel et la création de valeur partagée.',
+  about_v5_h:'Impact africain',
+  about_v5_p:"Nous contribuons activement au développement économique de l'Afrique en catalysant des investissements structurants et créateurs d'emplois.",
+  about_v6_h:'Confidentialité',
+  about_v6_p:'Toutes nos missions sont traitées avec la plus stricte confidentialité. La protection de vos informations stratégiques est notre priorité.',
+  about_team_label:'Notre équipe',about_team_h2:'Des experts à votre service',
+  about_team_p:"Une équipe pluridisciplinaire d'experts en finance, droit, ingénierie et stratégie d'entreprise au service de vos projets.",
+  about_team1_h:'Direction Générale',about_team1_role:'Directeur Général',
+  about_team1_p:"Expert en ingénierie financière et structuration de projets d'investissement. Plus de 15 ans d'expérience en Afrique et en Europe.",
+  about_team2_h:'Département Juridique',about_team2_role:'Responsable Juridique &amp; Compliance',
+  about_team2_p:"Spécialiste du droit des affaires africain, des partenariats public-privé et de la structuration contractuelle d'opérations complexes.",
+  about_team3_h:'Département Finance',about_team3_role:'Analyste Financier Senior',
+  about_team3_p:"Expert en modélisation financière, analyse de risques et structuration de dette. Formation école de commerce internationale.",
+  about_team4_h:'Département Technique',about_team4_role:'Ingénieur Expert',
+  about_team4_p:"Spécialiste de l'expertise industrielle et immobilière. Certifié en évaluation d'actifs et audit technique.",
+  about_eth_label:'Notre engagement',about_eth_h2:'Éthique &amp; Responsabilité',
+  about_eth_p:"AMEXPERTS &amp; PARTNERS s'engage à exercer son activité dans le strict respect des principes déontologiques et des standards internationaux en matière de lutte contre la corruption, de protection des données et de responsabilité sociale.",
+  about_eth1:'Conformité réglementaire',about_eth2:'Protection des données',
+  about_eth3:"Conflits d'intérêts",about_eth4:'Responsabilité sociale',
+  about_eth_btn:'Prendre contact',
+},
+en:{
+  nav_home:'Home',nav_about:'About',
+  nav_services:'Our Services <i class="fas fa-chevron-down" style="font-size:.7em"></i>',
+  nav_realisations:'Projects',nav_blog:'News',
+  nav_options:'More <i class="fas fa-chevron-down" style="font-size:.7em"></i>',
+  nav_cta:'Consult',
+  nav_s1:'Project writing',nav_s2:'Resource mobilization',
+  nav_s3:'Professional training',nav_s4:'Financial structuring',
+  nav_s5:'Real estate expertise',nav_s6:'Industrial expertise',
+  nav_s7:'Insurance expertise',nav_s8:'Legal engineering',
+  nav_drop1:'Projects for funding',nav_drop2:'Our Partners',nav_drop3:'Corporate Brochure',
+  foot_h_svc:'Services',foot_h_nav:'Navigation',foot_h_contact:'Contact',
+  foot_tagline:'Advisory and project engineering firm. Industrial, technical, trade and representation expertise.',
+  foot_city:'Lomé, Togo · West Africa &amp; International',
+  foot_nl:'Newsletter — Analyses &amp; Opportunities',foot_nl_ph:'Your email',
+  foot_s1:'Project writing',foot_s2:'Resource mobilization',
+  foot_s3:'Financial structuring',foot_s4:'Real estate expertise',
+  foot_s5:'Legal engineering',foot_s6:'Training',
+  foot_n_blog:'News &amp; Blog',foot_n_part:'Our Partners',
+  foot_n_proj:'Projects for funding',foot_n_broch:'Brochure',
+  foot_copy:'© 2026 AMEXPERTS AND PARTNERS — All rights reserved | Ref. 71/62029/DG/AM&amp;P',
+  about_bc:'About',
+  about_ph_h1:'About the firm',
+  about_ph_p:'A multidisciplinary firm built on excellence, integrity and international vision.',
+  about_hist_label:'Our story',
+  about_hist_h2:'Born in Africa, open to the world',
+  about_hist_p1:"AMEXPERTS AND PARTNERS is an advisory and project engineering firm based in Lomé, Republic of Togo. Founded by seasoned experts in international finance, engineering and business law, the firm has established itself as a reference player in supporting major projects across West and Central Africa and internationally.",
+  about_hist_p2:"Our approach combines analytical rigour, strategic creativity and mastery of local realities to offer our clients financing and structuring solutions equal to their ambitions.",
+  about_stat1:'Years of experience',about_stat2:'Projects completed',about_stat3:'Countries covered',
+  about_vision_h3:'Our vision',
+  about_vision_q:"\"To become the reference firm in project engineering and financial structuring for Africa's economic development, by mobilising the best human, technical and financial expertise.\"",
+  about_mission_h3:'Our mission',
+  about_mission_p:'To support businesses, institutions and investors in designing, structuring and delivering their projects, offering expert, ethical and results-oriented advice.',
+  about_val_label:'What guides us',about_val_h2:'Our core values',
+  about_v1_h:'Excellence',
+  about_v1_p:'We aim for the highest quality in every assignment, mobilising the best experts and applying international standards.',
+  about_v2_h:'Integrity',
+  about_v2_p:'Professional ethics is at the heart of all our work. We handle every file with transparency and honesty.',
+  about_v3_h:'Innovation',
+  about_v3_p:"We develop creative solutions tailored to each client's specific challenges, anticipating market developments.",
+  about_v4_h:'Partnership',
+  about_v4_p:'We build lasting relationships with our clients, based on trust, mutual respect and shared value creation.',
+  about_v5_h:'African impact',
+  about_v5_p:"We actively contribute to Africa's economic development by catalysing structural investments and job creation.",
+  about_v6_h:'Confidentiality',
+  about_v6_p:'All our assignments are handled with the strictest confidentiality. Protecting your strategic information is our priority.',
+  about_team_label:'Our team',about_team_h2:'Experts at your service',
+  about_team_p:'A multidisciplinary team of finance, legal, engineering and business strategy experts at the service of your projects.',
+  about_team1_h:'General Management',about_team1_role:'Chief Executive Officer',
+  about_team1_p:'Expert in financial engineering and investment project structuring. Over 15 years of experience in Africa and Europe.',
+  about_team2_h:'Legal Department',about_team2_role:'Head of Legal &amp; Compliance',
+  about_team2_p:'Specialist in African business law, public-private partnerships and contractual structuring of complex operations.',
+  about_team3_h:'Finance Department',about_team3_role:'Senior Financial Analyst',
+  about_team3_p:'Expert in financial modelling, risk analysis and debt structuring. International business school background.',
+  about_team4_h:'Technical Department',about_team4_role:'Expert Engineer',
+  about_team4_p:'Specialist in industrial and real estate expertise. Certified in asset valuation and technical auditing.',
+  about_eth_label:'Our commitment',about_eth_h2:'Ethics &amp; Responsibility',
+  about_eth_p:'AMEXPERTS &amp; PARTNERS is committed to operating in strict compliance with ethical principles and international standards regarding anti-corruption, data protection and social responsibility.',
+  about_eth1:'Regulatory compliance',about_eth2:'Data protection',
+  about_eth3:'Conflicts of interest',about_eth4:'Social responsibility',
+  about_eth_btn:'Get in touch',
+}
+};
+
+function applyLang(l){
+  if(!D[l])return;
+  var d=D[l];
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var k=el.getAttribute('data-i18n');
+    if(d[k]!==undefined)el.innerHTML=d[k];
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
+    var k=el.getAttribute('data-i18n-ph');
+    if(d[k]!==undefined)el.placeholder=d[k];
+  });
+  document.querySelectorAll('.lang-btn').forEach(function(b){
+    b.classList.toggle('active',b.dataset.lang===l);
+  });
+  document.documentElement.lang=l;
+  try{localStorage.setItem('amp_lang',l);}catch(e){}
+  window._ampLang=l;
+}
+
+/* Boutons langue */
+document.querySelectorAll('.lang-btn').forEach(function(b){
+  b.addEventListener('click',function(){applyLang(this.dataset.lang);});
+});
+
+/* Navbar toggle mobile */
+var _tog=document.getElementById('navToggle');
+var _lnk=document.getElementById('navLinks');
+if(_tog&&_lnk){
+  _tog.addEventListener('click',function(){_lnk.classList.toggle('open');});
+  _lnk.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click',function(){_lnk.classList.remove('open');});
+  });
+}
+
+/* Animations fade-up */
+(function(){
+  var els=document.querySelectorAll('.fade-up');
+  setTimeout(function(){els.forEach(function(el){el.classList.add('visible');});},600);
+  try{
+    var obs=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});
+    },{threshold:0.05});
+    els.forEach(function(el){obs.observe(el);});
+  }catch(e){els.forEach(function(el){el.classList.add('visible');});}
+})();
+
+/* Counters animés */
+document.querySelectorAll('.counter').forEach(function(el){
+  var target=parseInt(el.dataset.target)||0;
+  var suffix=el.dataset.suffix||'';
+  setTimeout(function(){el.textContent=target+suffix;},2200);
+  try{
+    var obs=new IntersectionObserver(function(entries){
+      if(!entries[0].isIntersecting)return;
+      obs.disconnect();
+      var cur=0,step=target/(1800/16);
+      var tick=function(){
+        cur=Math.min(cur+step,target);
+        el.textContent=Math.floor(cur)+suffix;
+        if(cur<target)requestAnimationFrame(tick);
+      };
+      tick();
+    });
+    obs.observe(el);
+  }catch(e){el.textContent=target+suffix;}
+});
+
+/* Init : appliquer la langue sauvegardée */
+var _sl='fr';
+try{_sl=localStorage.getItem('amp_lang')||'fr';}catch(e){}
+applyLang(_sl);
+window.applyLang=applyLang;
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════
+     2. FIREBASE — après la traduction
+     ══════════════════════════════════════════════ -->
+<script>
+const _FB={
+  apiKey:"AIzaSyBZ884tU0oT_bDljeCsPeMB0nOVxzbmfs4",
+  authDomain:"amexperts-and-partners.firebaseapp.com",
+  projectId:"amexperts-and-partners",
+  storageBucket:"amexperts-and-partners.firebasestorage.app",
+  messagingSenderId:"659477414372",
+  appId:"1:659477414372:web:bea30caf34ce75505187f1"
+};
+let _db=null;
+function getDB(){
+  if(_db)return _db;
+  if(!firebase.apps.length)firebase.initializeApp(_FB);
+  _db=firebase.firestore();
+  return _db;
+}
+try{getDB();console.log('✅ Firebase OK — about.html');}catch(e){console.error('Firebase:',e);}
+
+/* Newsletter footer */
+document.querySelectorAll('#newsletterForm').forEach(function(form){
+  form.addEventListener('submit',async function(e){
+    e.preventDefault();
+    var inp=this.querySelector('input[type="email"]');
+    if(!inp||!inp.value.trim())return;
+    var btn=this.querySelector('button[type="submit"]'),orig=btn?btn.textContent:'OK';
+    if(btn){btn.textContent='…';btn.disabled=true;}
+    try{
+      await getDB().collection('newsletter').add({
+        email:inp.value.trim(),
+        date:new Date().toISOString(),
+        source:'about'
+      });
+      inp.value='';
+      if(btn)btn.textContent='✓';
+      setTimeout(function(){if(btn){btn.textContent=orig;btn.disabled=false;}},2000);
+    }catch(err){
+      console.error('Newsletter:',err);
+      if(btn){btn.textContent=orig;btn.disabled=false;}
+    }
+  });
+});
+</script>
+
+</body>
+</html>
